@@ -1,5 +1,8 @@
 <?php
-include_once("./Services/Calendar/classes/class.ilAppointmentCustomGridPlugin.php");
+
+use SRAG\Plugins\UnibeCalendarCustomGrid\UI\Item\Upload;
+
+require_once('./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/vendor/autoload.php');
 
 /**
  * Class ilUnibeCalendarCustomGridPlugin
@@ -30,7 +33,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 			$renderer = $DIC->ui()->renderer();
 			$factory = $DIC->ui()->factory();
 
-			$wrapper = $factory->dropzone()->file()->wrapper("#", $factory->legacy($a_content));
+			$wrapper = $factory->dropzone()->file()->wrapper($this->getUploadURL(), $factory->legacy($a_content));
 
 			return $renderer->render($wrapper); // this seems to be rendered in a very strahnge place
 		}
@@ -43,12 +46,15 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 * @return bool
 	 */
 	private function isSession() {
-		$appointment = $this->getAppointment();
+		$cat = $this->getCategory();
 
-		$cat_id = ilCalendarCategoryAssignments::_lookupCategory($appointment->getEntryId());
-		$cat = ilCalendarCategory::getInstanceByCategoryId($cat_id);
+		$is_session = $cat->getObjType() === "sess";
 
-		return $cat->getObjType() === "sess";
+		if ($is_session) {
+			$this->initJS();
+		}
+
+		return $is_session;
 	}
 
 
@@ -74,9 +80,14 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 * @return \ILIAS\UI\Component\Item\Item
 	 */
 	public function editAgendaItem(\ILIAS\UI\Component\Item\Item $a_item) {
-		// global $DIC;
-		// return $DIC->ui()->factory()->dropzone()->file()->wrapper("#", $a_item);
-		return $a_item; // here we should be able to wrap the item with a dropzone, surrently not possible
+		if ($this->isSession()) {
+
+			$item = (new Upload($a_item->getTitle()))->withUploadURL($this->getUploadURL());
+
+			return $item;
+		}
+
+		return $a_item;
 	}
 
 
@@ -85,5 +96,47 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 */
 	public function editShyButtonTitle() {
 		return "[PLUGIN] editShyButtonTitle"; // Where is this rendered?
+	}
+
+
+	private function initJS() {
+		static $init;
+		if (!$init) {
+			global $DIC;
+			$DIC->ui()
+			    ->mainTemplate()
+			    ->addJavaScript("./libs/bower/bower_components/jquery-dragster/jquery.dragster.js");
+			$DIC->ui()
+			    ->mainTemplate()
+			    ->addJavaScript("./libs/bower/bower_components/fine-uploader/dist/fine-uploader.core.min.js");
+			$DIC->ui()
+			    ->mainTemplate()
+			    ->addJavaScript("./src/UI/templates/js/Dropzone/File/uploader.js");
+			$DIC->ui()
+			    ->mainTemplate()
+			    ->addJavaScript("./src/UI/templates/js/Dropzone/File/dropzone.js");
+			$init = true;
+		}
+	}
+
+
+	/**
+	 * @return \ilCalendarCategory
+	 */
+	private function getCategory(): \ilCalendarCategory {
+		$appointment = $this->getAppointment();
+
+		$cat_id = ilCalendarCategoryAssignments::_lookupCategory($appointment->getEntryId());
+		$cat = ilCalendarCategory::getInstanceByCategoryId($cat_id);
+
+		return $cat;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	private function getUploadURL(): string {
+		return (new ilUnibeUploadHandlerGUI())->buildUploadURL($this->getCategory()->getObjId());
 	}
 }
