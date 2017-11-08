@@ -60,6 +60,9 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	}
 
 
+	/**
+	 * @return string
+	 */
 	public function addGlyph() {
 		return "";
 	}
@@ -78,9 +81,9 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 
 
 	/**
-	 * @return string new shy button title.
+	 * @return string
 	 */
 	public function editShyButtonTitle() {
-		return "[PLUGIN editShyButtonTitle] changed this title."; // Where is this rendered?
+		return "[PLUGIN] editShyButtonTitle"; // Where is this rendered?
 	}
 }
