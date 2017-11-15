@@ -35,7 +35,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 
 			$wrapper = $factory->dropzone()->file()->wrapper($this->getUploadURL(), $factory->legacy($a_content));
 
-			return $renderer->render($wrapper); // this seems to be rendered in a very strahnge place
+			return $renderer->render($wrapper); // this seems to be rendered in a very strange place
 		}
 
 		return $a_content;
@@ -81,7 +81,6 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 */
 	public function editAgendaItem(\ILIAS\UI\Component\Item\Item $a_item) {
 		if ($this->isSession()) {
-
 			$item = (new Upload($a_item->getTitle()))->withUploadURL($this->getUploadURL());
 
 			return $item;
