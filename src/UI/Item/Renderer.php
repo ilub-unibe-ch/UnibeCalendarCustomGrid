@@ -33,6 +33,14 @@ class Renderer extends DefaultRenderer {
 		              ->file()
 		              ->wrapper($component->getUploadUrl(), $f->legacy($original_rendering));
 
+		$dropzone = $dropzone->withAdditionalOnLoadCode(function($id){
+			/**
+			 * @var $DIC \ILIAS\DI\Container
+			 */
+			$target = $actual_link = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+			return "il.Unibe.customizeWrapper($id,'$target')";
+		});
+
 		return $default_renderer->render($dropzone);
 	}
 
