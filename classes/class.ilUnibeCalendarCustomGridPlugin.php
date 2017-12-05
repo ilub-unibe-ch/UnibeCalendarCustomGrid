@@ -18,6 +18,10 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 		return "UnibeCalendarCustomGrid";
 	}
 
+	/**
+	 * ilCalendarCategory []
+	 */
+	protected $categories = [];
 
 	/**
 	 * Replace the whole appointment presentation in the grid.
@@ -27,18 +31,46 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 * @return mixed string or empty.
 	 */
 	public function replaceContent($a_content) {
+		/**
+		 * @var $DIC \ILIAS\DI\Container
+		 */
 		global $DIC;
 
-		if ($this->isSession()) {
-			$renderer = $DIC->ui()->renderer();
-			$factory = $DIC->ui()->factory();
+		$renderer = $DIC->ui()->renderer();
+		$factory = $DIC->ui()->factory();
 
-			$wrapper = $factory->dropzone()->file()->wrapper($this->getUploadURL(), $factory->legacy($a_content));
+		if ($this->isSession() && $this->checkWriteAccess()) {
+
+			$wrapper = $factory->dropzone()->file()->wrapper(
+					$this->getUploadURL(),
+					$factory->legacy($a_content))->withTitle($this->txt("upload_to")." ".$this->getCategory()->getTitle());
+
+			$wrapper = $wrapper->withAdditionalOnLoadCode(function($id){
+				/**
+				 * @var $DIC \ILIAS\DI\Container
+				 */
+				$target = $actual_link = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+				return "il.Unibe.customizeWrapper($id,'$target')";
+			});
 
 			return $renderer->render($wrapper); // this seems to be rendered in a very strange place
 		}
 
 		return $a_content;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function checkWriteAccess(){
+		global $DIC;
+
+		$system = $DIC->rbac()->system();
+
+		$ref_id = array_pop(ilObject::_getAllReferences($this->getCategory()->getObjId()));
+
+		return $system->checkAccess("write",$ref_id);
+
 	}
 
 
@@ -62,7 +94,46 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 * @return string or empty.
 	 */
 	public function addExtraContent() {
-		return "";
+		global $DIC;
+
+		$renderer = $DIC->ui()->renderer();
+		$factory = $DIC->ui()->factory();
+
+		$event_items = (ilObjectActivation::getItemsByEvent($this->getCategory()->getObjId()));
+
+		$content = "";
+		$files = [];
+
+		if(count($event_items))
+		{
+			include_once('./Services/Link/classes/class.ilLink.php');
+			$files = [];
+			foreach ($event_items as $item)
+			{
+				if($item['type'] == "file") {
+					$has_files = true;
+					$href = ilLink::_getStaticLink($item['ref_id'], "file", true,"download");
+					$files[$item['title']] = $renderer->render(
+							$factory->button()->shy($item['title'].";", $href));
+				}
+			}
+			if($has_files)
+			{
+				$content = "</br>Files: ";
+				ksort($files, SORT_NATURAL | SORT_FLAG_CASE);
+				foreach($files as $file){
+					$content .= $file." ";
+
+				}
+			}
+		}
+
+
+
+
+
+		return $content;
+
 	}
 
 
@@ -80,10 +151,10 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 * @return \ILIAS\UI\Component\Item\Item
 	 */
 	public function editAgendaItem(\ILIAS\UI\Component\Item\Item $a_item) {
-		if ($this->isSession()) {
-			$item = (new Upload($a_item->getTitle()))->withUploadURL($this->getUploadURL());
-
-			return $item;
+		if ($this->isSession() && $this->checkWriteAccess()) {
+			$upload_item = (new Upload($a_item->getTitle()))->withUploadURL($this->getUploadURL());
+			$upload_item = $upload_item->copyFromItem($a_item);
+			return $upload_item;
 		}
 
 		return $a_item;
@@ -94,7 +165,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 * @return string
 	 */
 	public function editShyButtonTitle() {
-		return "[PLUGIN] editShyButtonTitle"; // Where is this rendered?
+		return false;
 	}
 
 
@@ -114,6 +185,9 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 			$DIC->ui()
 			    ->mainTemplate()
 			    ->addJavaScript("./src/UI/templates/js/Dropzone/File/dropzone.js");
+			$DIC->ui()
+					->mainTemplate()
+					->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/customizeWrapper.js");
 			$init = true;
 		}
 	}
@@ -123,12 +197,12 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 * @return \ilCalendarCategory
 	 */
 	private function getCategory(): \ilCalendarCategory {
-		$appointment = $this->getAppointment();
-
-		$cat_id = ilCalendarCategoryAssignments::_lookupCategory($appointment->getEntryId());
-		$cat = ilCalendarCategory::getInstanceByCategoryId($cat_id);
-
-		return $cat;
+		$entry_id = $this->getAppointment()->getEntryId();
+		if(! array_key_exists($entry_id, $this->categories)){
+			$cat_id = ilCalendarCategoryAssignments::_lookupCategory($entry_id);
+			$this->categories[$this->getAppointment()->getEntryId()] = ilCalendarCategory::getInstanceByCategoryId($cat_id);
+		}
+		return $this->categories[$entry_id];
 	}
 
 

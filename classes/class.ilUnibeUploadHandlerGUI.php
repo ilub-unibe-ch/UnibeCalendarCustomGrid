@@ -49,12 +49,13 @@ class ilUnibeUploadHandlerGUI implements ICtrlAware {
 		try {
 			$upload->process();
 
+			$message = "";
 			foreach ($upload->getResults() as $tempname => $result) {
-				$this->handleFileUpload($tempname, $result);
+				$message .= $this->handleFileUpload($tempname, $result);
 			}
 
 			// The File-Dropzones will expect a valid json-Status (success true or false).
-			echo json_encode([ 'success' => true, 'message' => 'Successfully uploaded file' ]);
+			echo json_encode([ 'success' => true, 'message' => $message ]);
 		} catch (Exception $e) {
 			echo json_encode([ 'success' => false, 'message' => $e->getMessage() ]);
 		}
@@ -67,8 +68,7 @@ class ilUnibeUploadHandlerGUI implements ICtrlAware {
 	 * @param \ILIAS\FileUpload\DTO\UploadResult $result
 	 */
 	private function handleFileUpload(string $tempname, \ILIAS\FileUpload\DTO\UploadResult $result) {
-		$ev = new ilEventItems($this->getObjId());
-		$items = $ev->getItems();
+		global $DIC;
 
 		$file = new \ilObjFile();
 		$file->setTitle($result->getName());
@@ -83,10 +83,21 @@ class ilUnibeUploadHandlerGUI implements ICtrlAware {
 		$file->createDirectory();
 		$file->getUploadFile($tempname, $result->getName());
 
-		$items[] = $new_ref_id;
-
-		$ev->setItems($items);
+		/*
+		 * This would be the "right" way to do it, however this can create race conditions
+		 * in multiple file upload. Therefore we execute the query directly here.
+		$ev = new ilEventItems($this->getObjId());
+		$ev->addItem($new_ref_id);
 		$ev->update();
+		 */
+		$query = "INSERT INTO event_items (event_id,item_id) ".
+				"VALUES( ".
+				$DIC->database()->quote($this->getObjId() ,'integer').", ".
+				$DIC->database()->quote($new_ref_id ,'integer')." ".
+				")";
+		$DIC->database()->manipulate($query);
+
+		return "Inserted file with ref_id: ".$new_ref_id." into event_id: .".$this->getObjId();
 	}
 
 

@@ -22,7 +22,10 @@ class Renderer extends DefaultRenderer {
 		 */
 		$f = $this->getUIFactory();
 
-		$item = $this->buildOriginalItem($component);
+		//Build original standard item
+		$f = $this->getUIFactory();
+		$item = $f->item()->standard($component->getTitle());
+		$item = $component->copyToItem($item);
 
 		$original_rendering = $default_renderer->render($item);
 
@@ -33,37 +36,6 @@ class Renderer extends DefaultRenderer {
 		return $default_renderer->render($dropzone);
 	}
 
-
-	/**
-	 * @param \ILIAS\UI\Component\Item\Item $component
-	 *
-	 * @return \ILIAS\UI\Component\Item\Item
-	 */
-	protected function buildOriginalItem(Component\Item\Item $component) {
-		$f = $this->getUIFactory();
-
-		$item = $f->item()->standard($component->getTitle());
-
-		if ($component->getProperties()) {
-			$item = $item->withProperties($component->getProperties());
-		}
-		if ($component->getDescription()) {
-			$item = $item->withDescription($component->getDescription());
-		}
-		if ($component->getColor()) {
-			$item = $item->withColor($component->getColor());
-		}
-		if ($component->getActions()) {
-			$item = $item->withActions($component->getActions());
-		}
-		if ($component->getLead()) {
-			$item = $item->withLeadImage($component->getLead());
-		} else {
-			$item = $item->withNoLead();
-		}
-
-		return $item;
-	}
 
 
 	/**
