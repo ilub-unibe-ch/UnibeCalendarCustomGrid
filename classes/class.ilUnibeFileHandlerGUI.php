@@ -2,17 +2,16 @@
 
 use SRAG\Plugins\UnibeCalendarCustomGrid\Ctrl\CtrlAware;
 use SRAG\Plugins\UnibeCalendarCustomGrid\Ctrl\ICtrlAware;
+use ILIAS\FileUpload\Processor\FilenameOverridePreProcessor;
 
 require_once('./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/vendor/autoload.php');
 
 /**
- * Class ilUnibeUploadHandlerGUI
+ * Class ilUnibeFileHandlerGUI
  *
- * @author            Fabian Schmid <fs@studer-raimann.ch>
- *
- * @ilCtrl_isCalledBy ilUnibeUploadHandlerGUI: ilUIPluginRouterGUI
+ * @ilCtrl_isCalledBy ilUnibeFileHandlerGUI: ilUIPluginRouterGUI
  */
-class ilUnibeUploadHandlerGUI implements ICtrlAware {
+class ilUnibeFileHandlerGUI implements ICtrlAware {
 
 	const P_SESSION_OBJ_ID = 'session_id';
 	use CtrlAware;
@@ -37,15 +36,91 @@ class ilUnibeUploadHandlerGUI implements ICtrlAware {
 		return $this->ctrl()->getLinkTargetByClass([
 			ilUIPluginRouterGUI::class,
 			self::class,
-		], self::CMD_INDEX, '', true);
+		], self::CMD_UPLOAD, '', true);
+	}
+
+	/**
+	 * @param $obj_id
+	 * @return string
+	 */
+	public function buildDownloadURL($obj_id) {
+		$this->ctrl()->setParameter($this, self::P_SESSION_OBJ_ID, $obj_id);
+
+		return $this->ctrl()->getLinkTargetByClass([
+				ilUIPluginRouterGUI::class,
+				self::class,
+		], self::CMD_DOWNLOAD, '', true);
+	}
+
+	/**
+	 * @param $obj_id
+	 * @return bool
+	 */
+	public function hasFiles($obj_id){
+		$event_items = (ilObjectActivation::getItemsByEvent($obj_id));
+
+		if (count($event_items)) {
+			foreach ($event_items as $item) {
+				if ($item['type'] == "file") {
+					return true;
+				}
+			}
+		}
+	}
+
+	public function download()
+	{
+		global $DIC;
+		$this->initIDsFromRequest();
+
+		$session = new ilObjSession($this->ref_id);
+		$download_name = $session->getTitle().".zip";
+		$event_items = (ilObjectActivation::getItemsByEvent($this->obj_id));
+
+		if (count($event_items)) {
+			$temp_folder_name = "calendarout/".uniqid();
+			$temp = $DIC->filesystem()->storage();
+			$store = $DIC->filesystem()->storage();
+			foreach ($event_items as $item) {
+
+				if ($item['type'] == "file") {
+					$file = new ilObjFile($item['ref_id']);
+					//var_dump($file);
+					$file_name =  $file->getFileName();
+					$file_path = $file->getDirectory($file->getVersion())."/".$file_name;
+					$rel_file_path = str_replace(CLIENT_DATA_DIR,"",$file_path);
+					$stream = $store->readStream($rel_file_path);
+					$full_temp_path ="$temp_folder_name/$file_name";
+					if(!$temp->has($full_temp_path)){
+						$temp->writeStream($full_temp_path, $stream);
+					}
+
+
+				}
+			}
+
+
+			$tmp_zip_folder = CLIENT_DATA_DIR."/".$temp_folder_name;
+			$tmp_zip_file = $tmp_zip_folder.".zip";
+			ilUtil::zip($tmp_zip_folder,$tmp_zip_file,true);
+			$temp->deleteDir($temp_folder_name);
+			ilFileDelivery::deliverFileAttached($tmp_zip_file,$download_name,'',true);
+
+		}
 	}
 
 
-	public function index() {
+
+
+	public function upload() {
 		global $DIC;
 		$this->initIDsFromRequest();
 
 		$upload = $DIC->upload();
+		if($_POST["customFileName"]){
+			$upload->register(new FilenameOverridePreProcessor($_POST["customFileName"]));
+		}
+
 		try {
 			$upload->process();
 
@@ -64,16 +139,18 @@ class ilUnibeUploadHandlerGUI implements ICtrlAware {
 
 
 	/**
-	 * @param string                             $tempname
+	 * @param string $tempname
 	 * @param \ILIAS\FileUpload\DTO\UploadResult $result
+	 * @return string
 	 */
 	private function handleFileUpload(string $tempname, \ILIAS\FileUpload\DTO\UploadResult $result) {
 		global $DIC;
 
 		$file = new \ilObjFile();
+
 		$file->setTitle($result->getName());
-		$file->setDescription('');
 		$file->setFileName($result->getName());
+		$file->setDescription('');
 		$file->setFileType($result->getMimeType());
 		$file->setFileSize($result->getSize());
 		$file->create();

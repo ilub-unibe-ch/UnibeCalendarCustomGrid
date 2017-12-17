@@ -22,6 +22,7 @@ class ComposerStaticInit11b911b17e133b1b4ed974c8c86fc757
 
     public static $classMap = array (
         'ilAppointmentBaseFileHandler' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/FileHandler/class.ilAppointmentBaseFileHandler.php',
+        'ilAppointmentBookingPoolFileHandler' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/FileHandler/class.ilAppointmentBookingPoolFileHandler.php',
         'ilAppointmentConsultationHoursFileHandler' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/FileHandler/class.ilAppointmentConsultationHoursFileHandler.php',
         'ilAppointmentCourseFileHandler' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/FileHandler/class.ilAppointmentCourseFileHandler.php',
         'ilAppointmentCustomGridPlugin' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilAppointmentCustomGridPlugin.php',
@@ -193,7 +194,7 @@ class ComposerStaticInit11b911b17e133b1b4ed974c8c86fc757
         'ilTimeZone' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilTimeZone.php',
         'ilTimeZoneException' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilTimeZoneException.php',
         'ilUnibeCalendarCustomGridPlugin' => __DIR__ . '/../..' . '/classes/class.ilUnibeCalendarCustomGridPlugin.php',
-        'ilUnibeUploadHandlerGUI' => __DIR__ . '/../..' . '/classes/class.ilUnibeUploadHandlerGUI.php',
+        'ilUnibeFileHandlerGUI' => __DIR__ . '/../..' . '/classes/class.ilUnibeFileHandlerGUI.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

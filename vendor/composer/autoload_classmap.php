@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'ilAppointmentBaseFileHandler' => $baseDir . '/../../../../../../../Services/Calendar/classes/FileHandler/class.ilAppointmentBaseFileHandler.php',
+    'ilAppointmentBookingPoolFileHandler' => $baseDir . '/../../../../../../../Services/Calendar/classes/FileHandler/class.ilAppointmentBookingPoolFileHandler.php',
     'ilAppointmentConsultationHoursFileHandler' => $baseDir . '/../../../../../../../Services/Calendar/classes/FileHandler/class.ilAppointmentConsultationHoursFileHandler.php',
     'ilAppointmentCourseFileHandler' => $baseDir . '/../../../../../../../Services/Calendar/classes/FileHandler/class.ilAppointmentCourseFileHandler.php',
     'ilAppointmentCustomGridPlugin' => $baseDir . '/../../../../../../../Services/Calendar/classes/class.ilAppointmentCustomGridPlugin.php',
@@ -178,5 +179,5 @@ return array(
     'ilTimeZone' => $baseDir . '/../../../../../../../Services/Calendar/classes/class.ilTimeZone.php',
     'ilTimeZoneException' => $baseDir . '/../../../../../../../Services/Calendar/classes/class.ilTimeZoneException.php',
     'ilUnibeCalendarCustomGridPlugin' => $baseDir . '/classes/class.ilUnibeCalendarCustomGridPlugin.php',
-    'ilUnibeUploadHandlerGUI' => $baseDir . '/classes/class.ilUnibeUploadHandlerGUI.php',
+    'ilUnibeFileHandlerGUI' => $baseDir . '/classes/class.ilUnibeFileHandlerGUI.php',
 );

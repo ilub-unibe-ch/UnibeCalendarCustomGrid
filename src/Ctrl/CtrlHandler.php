@@ -10,9 +10,9 @@ namespace SRAG\Plugins\UnibeCalendarCustomGrid\Ctrl;
 trait CtrlHandler {
 
 	/**
-	 * @param \SRAG\Learnplaces\gui\helper\ICtrlAware $ctrlAware
-	 *
+	 * @param ICtrlAware $ctrlAware
 	 * @return bool whether a next class has handled the request or not
+	 * @throws \ilCtrlException
 	 */
 	public function handleNextClass(ICtrlAware $ctrlAware) {
 		if (!$this instanceof ICtrlAware) {

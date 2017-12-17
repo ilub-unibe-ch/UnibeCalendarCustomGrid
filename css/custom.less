@@ -1,0 +1,48 @@
+.calevent .il-dropzone .il_calevent >:not(span) a {
+  color: inherit;
+  font-size: 12px;
+}
+
+.il-dropzone .il_calevent >:not(span) a {
+  color: inherit;
+  font-size: 12px;
+}
+
+
+.calevent a.il-downloader  {
+  color: inherit;
+  font-size: 12px;
+}
+
+
+.il_calevent {
+  position: relative;
+
+  .glyphicon-download{
+    position: absolute;
+    top: 3px;
+    right: 3px;
+  }
+
+  > a.btn-link:first-child{
+    display:inline;
+    font-weight: bold;
+    &:before{
+      content:"\a";
+      white-space: pre;
+    }
+  }
+}
+
+.il-cal-month{
+  .il_calevent {
+    padding: 3px;
+  }
+  a.il-downloader  {
+    color: inherit;
+    font-size: 14px;
+  }
+  .il_cal_navigation{
+    display: none;
+  }
+}

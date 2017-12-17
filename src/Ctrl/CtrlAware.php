@@ -25,7 +25,7 @@ trait CtrlAware {
 			return true;
 		}
 		$this->tpl()->getStandardTemplate();
-		$cmd = $this->ctrl()->getCmd(ICtrlAware::CMD_INDEX);
+		$cmd = $this->ctrl()->getCmd();
 		if ($this->getActiveTabId()) {
 			$this->tabs()->activateTab($this->getActiveTabId());
 		}

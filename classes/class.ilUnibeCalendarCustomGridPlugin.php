@@ -6,8 +6,6 @@ require_once('./Customizing/global/plugins/Services/Calendar/AppointmentCustomGr
 
 /**
  * Class ilUnibeCalendarCustomGridPlugin
- *
- * @author Fabian Schmid <fs@studer-raimann.ch>
  */
 class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 
@@ -53,7 +51,8 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 				return "il.Unibe.customizeWrapper($id,'$target')";
 			});
 
-			return $renderer->render($wrapper); // this seems to be rendered in a very strange place
+			$wrapper= $wrapper->withUserDefinedFileNamesEnabled(true);
+			return "<span>".$renderer->render($wrapper)."</span>";
 		}
 
 		return $a_content;
@@ -83,7 +82,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 		$is_session = $cat->getObjType() === "sess";
 
 		if ($is_session) {
-			$this->initJS();
+			$this->initJSAndCSS();
 		}
 
 		return $is_session;
@@ -94,46 +93,63 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 * @return string or empty.
 	 */
 	public function addExtraContent() {
+
+		$content = "";
+		$content .= $this->getFilesHtml();
+		$content .= $this->getMetaDataHtml();
+
+		return $content;
+
+	}
+
+	protected function getMetaDataHtml(){
 		global $DIC;
 
 		$renderer = $DIC->ui()->renderer();
 		$factory = $DIC->ui()->factory();
 
-		$event_items = (ilObjectActivation::getItemsByEvent($this->getCategory()->getObjId()));
+		$meta_html = "";
 
-		$content = "";
-		$files = [];
+		$obj_id = $this->getCategory()->getObjId();
+		$query = "SELECT val.value
+			FROM adv_md_values_text as val
+			INNER JOIN adv_mdf_definition as def ON  val.field_id = def.field_id
+			WHERE def.title = 'Dozierende' AND val.obj_id = $obj_id";
+		$res = $DIC->database()->query($query);
 
-		if(count($event_items))
+		if($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
-			include_once('./Services/Link/classes/class.ilLink.php');
-			$files = [];
-			foreach ($event_items as $item)
-			{
-				if($item['type'] == "file") {
-					$has_files = true;
-					$href = ilLink::_getStaticLink($item['ref_id'], "file", true,"download");
-					$files[$item['title']] = $renderer->render(
-							$factory->button()->shy($item['title'].";", $href));
+			$meta_html .= "<div class='il-dozenten'> (";
+			$exploded = explode(",",$row->value);
+			foreach($exploded as $complete_link){
+				$name_only = trim(strip_tags ($complete_link));
+				$words = explode(" ", $name_only);
+				$acronym = "";
+				foreach ($words as $w) {
+					$acronym .= $w[0];
 				}
+				$short_link = str_replace($name_only,$acronym,$complete_link);
+				$meta_html .= $short_link.", ";
 			}
-			if($has_files)
-			{
-				$content = "</br>Files: ";
-				ksort($files, SORT_NATURAL | SORT_FLAG_CASE);
-				foreach($files as $file){
-					$content .= $file." ";
+			$meta_html = rtrim($meta_html,", ").")</div>";
 
-				}
-			}
 		}
 
+		return $meta_html;
+	}
+
+	protected function getFilesHtml(){
+		$obj_id = $this->getCategory()->getObjId();
 
 
+		$file_handler = new ilUnibeFileHandlerGUI();
+		if($file_handler->hasFiles($obj_id)){
+			$url = $file_handler->buildDownloadURL($obj_id);
+			return  "<a class='il-downloader' href='$url'><div class=\"glyphicon glyphicon-download\" aria-hidden=\"true\"></div></a>";
 
+		}
 
-		return $content;
-
+		return "";
 	}
 
 
@@ -141,7 +157,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 * @return string
 	 */
 	public function addGlyph() {
-		return "";
+		return false;
 	}
 
 
@@ -169,7 +185,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	}
 
 
-	private function initJS() {
+	private function initJSAndCSS() {
 		static $init;
 		if (!$init) {
 			global $DIC;
@@ -188,6 +204,9 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 			$DIC->ui()
 					->mainTemplate()
 					->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/customizeWrapper.js");
+			$DIC->ui()
+					->mainTemplate()
+					->addCss("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/css/custom.css");
 			$init = true;
 		}
 	}
@@ -210,6 +229,6 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 * @return string
 	 */
 	private function getUploadURL(): string {
-		return (new ilUnibeUploadHandlerGUI())->buildUploadURL($this->getCategory()->getObjId());
+		return (new ilUnibeFileHandlerGUI())->buildUploadURL($this->getCategory()->getObjId());
 	}
 }

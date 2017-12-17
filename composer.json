@@ -1,9 +1,13 @@
 {
-  "name": "studer-raimann/unibe-calendar-custom-grid",
+  "name": "ilub/unibe-calendar-custom-grid",
   "authors": [
     {
       "name": "Fabian Schmid",
       "email": "fs@studer-raimann.ch"
+    },
+    {
+      "name": "Timon Amsstutz",
+      "email": "timon.amstutz@bluewin.ch"
     }
   ],
   "require": {},

@@ -12,15 +12,8 @@ namespace SRAG\Plugins\UnibeCalendarCustomGrid\Ctrl;
  */
 interface ICtrlAware {
 
-	const CMD_INDEX = "index";
-	const CMD_ADD = "add";
-	const CMD_CREATE = "create";
-	const CMD_EDIT = "edit";
-	const CMD_UPDATE = "update";
-	const CMD_CONFIRM = "confirm";
-	const CMD_DELETE = "delete";
-	const CMD_CANCEL = "cancel";
-	const AR_ID = "arid";
+	const CMD_UPLOAD = "upload";
+	const CMD_DOWNLOAD = "download";
 
 
 	public function executeCommand();
@@ -38,10 +31,10 @@ interface ICtrlAware {
 	public function setParentController(ICtrlAware $ctrlAware);
 
 
-	public function index();
+	public function upload();
 
 
-	public function cancel();
+	public function download();
 
 
 	/**
