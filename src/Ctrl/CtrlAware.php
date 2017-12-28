@@ -32,6 +32,7 @@ trait CtrlAware {
 
 		switch ($cmd) {
 			default:
+				//@Todo: Important add permission checks here for various actions.
 				if ($this->checkRequestReferenceId()) {
 					$this->{$cmd}();
 				}

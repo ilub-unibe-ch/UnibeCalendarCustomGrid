@@ -31,15 +31,12 @@ class Renderer extends DefaultRenderer {
 
 		$dropzone = $f->dropzone()
 		              ->file()
-		              ->wrapper($component->getUploadUrl(), $f->legacy($original_rendering));
+		              ->wrapper($component->getUploadUrl(), $f->legacy($original_rendering))->withTitle($this->txt("upload").": ".$component->getTitle()->getLabel());
 
 		$dropzone = $dropzone->withAdditionalOnLoadCode(function($id){
-			/**
-			 * @var $DIC \ILIAS\DI\Container
-			 */
-			$target = $actual_link = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-			return "il.Unibe.customizeWrapper($id,'$target')";
+			return "il.Unibe.customizeWrapper($id)";
 		});
+		$dropzone= $dropzone->withUserDefinedFileNamesEnabled(true);
 
 		return $default_renderer->render($dropzone);
 	}

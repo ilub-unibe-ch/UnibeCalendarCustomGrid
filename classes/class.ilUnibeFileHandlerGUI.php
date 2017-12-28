@@ -14,6 +14,7 @@ require_once('./Customizing/global/plugins/Services/Calendar/AppointmentCustomGr
 class ilUnibeFileHandlerGUI implements ICtrlAware {
 
 	const P_SESSION_OBJ_ID = 'session_id';
+	const P_FILE_REF_ID = 'file_id';
 	use CtrlAware;
 	/**
 	 * @var int
@@ -24,10 +25,14 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 	 */
 	protected $ref_id = 0;
 
+	/**
+	 * @var int
+	 */
+	protected $file_id = 0;
+
 
 	/**
-	 * @param int $session_obj_id
-	 *
+	 * @param $session_obj_id
 	 * @return string
 	 */
 	public function buildUploadURL($session_obj_id) {
@@ -50,6 +55,33 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 				ilUIPluginRouterGUI::class,
 				self::class,
 		], self::CMD_DOWNLOAD, '', true);
+	}
+
+	/**
+	 * @param $obj_id
+	 * @param $file_id
+	 * @return string
+	 */
+	public function buildDeleteAction($obj_id,$file_id) {
+		$this->ctrl()->setParameter($this, self::P_SESSION_OBJ_ID, $obj_id);
+		$this->ctrl()->setParameter($this, self::P_FILE_REF_ID, $file_id);
+
+		$async_url = $this->ctrl()->getLinkTargetByClass([
+				ilUIPluginRouterGUI::class,
+				self::class,
+		], self::CMD_DELETE, '', true);
+		$action = "il.Unibe.deleteFile(this,'$async_url');";
+		return $action;
+	}
+
+	public function delete()
+	{
+		$this->initIDsFromRequest();
+
+		$file = new ilObjFile($this->getFileId());
+		$file->delete();
+		echo $file->getTitle()." Deleted";
+		exit;
 	}
 
 	/**
@@ -212,6 +244,7 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 
 	private function initIDsFromRequest() {
 		$this->setObjId($this->http()->request()->getQueryParams()[self::P_SESSION_OBJ_ID]);
+		$this->setFileId($this->http()->request()->getQueryParams()[self::P_FILE_REF_ID]);
 		$ref_ids = array();
 		foreach (ilObject::_getAllReferences($this->getObjId()) as $ref_id) {
 			if ($this->access()->checkAccess("read", "", $ref_id)) {
@@ -220,5 +253,21 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 		}
 
 		$this->setRefId((int)current($ref_ids));
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getFileId()
+	{
+		return $this->file_id;
+	}
+
+	/**
+	 * @param int $file_id
+	 */
+	public function setFileId($file_id)
+	{
+		$this->file_id = $file_id;
 	}
 }

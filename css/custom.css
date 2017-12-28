@@ -2,7 +2,7 @@
   color: inherit;
   font-size: 12px;
 }
-.il-dropzone .il_calevent > :not(span) a {
+.il-dropzone .il_calevent > :not(span) {
   color: inherit;
   font-size: 12px;
 }
@@ -13,7 +13,7 @@
 .il_calevent {
   position: relative;
 }
-.il_calevent .glyphicon-download {
+.il_calevent .glyphicon {
   position: absolute;
   top: 3px;
   right: 3px;
@@ -28,6 +28,8 @@
 }
 .il-cal-month .il_calevent {
   padding: 3px;
+  margin-bottom: 1px;
+  font-size: 12px;
 }
 .il-cal-month a.il-downloader {
   color: inherit;

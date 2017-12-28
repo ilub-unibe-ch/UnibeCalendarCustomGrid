@@ -42,13 +42,8 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 			$wrapper = $factory->dropzone()->file()->wrapper(
 					$this->getUploadURL(),
 					$factory->legacy($a_content))->withTitle($this->txt("upload_to")." ".$this->getCategory()->getTitle());
-
 			$wrapper = $wrapper->withAdditionalOnLoadCode(function($id){
-				/**
-				 * @var $DIC \ILIAS\DI\Container
-				 */
-				$target = $actual_link = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-				return "il.Unibe.customizeWrapper($id,'$target')";
+				return "il.Unibe.customizeWrapper($id)";
 			});
 
 			$wrapper= $wrapper->withUserDefinedFileNamesEnabled(true);
@@ -145,7 +140,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 		$file_handler = new ilUnibeFileHandlerGUI();
 		if($file_handler->hasFiles($obj_id)){
 			$url = $file_handler->buildDownloadURL($obj_id);
-			return  "<a class='il-downloader' href='$url'><div class=\"glyphicon glyphicon-download\" aria-hidden=\"true\"></div></a>";
+			return  "<a class='il-downloader' href='$url'><div class=\"glyphicon glyphicon-download-alt\" aria-hidden=\"true\"></div></a>";
 
 		}
 
@@ -207,6 +202,9 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 			$DIC->ui()
 					->mainTemplate()
 					->addCss("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/css/custom.css");
+			$DIC->ui()
+					->mainTemplate()
+					->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/deleteFile.js");
 			$init = true;
 		}
 	}

@@ -14,7 +14,7 @@ interface ICtrlAware {
 
 	const CMD_UPLOAD = "upload";
 	const CMD_DOWNLOAD = "download";
-
+	const CMD_DELETE = "delete";
 
 	public function executeCommand();
 
