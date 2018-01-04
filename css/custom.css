@@ -13,10 +13,10 @@
 .il_calevent {
   position: relative;
 }
-.il_calevent .glyphicon {
+.il_calevent .il-downloader .glyphicon {
   position: absolute;
-  top: 3px;
-  right: 3px;
+  top: 5px;
+  right: 5px;
 }
 .il_calevent > a.btn-link:first-child {
   display: inline;
