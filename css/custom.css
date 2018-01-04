@@ -6,6 +6,9 @@
   color: inherit;
   font-size: 12px;
 }
+.calevent .il-dropzone .il_calevent .il-dozenten a {
+  color: #557196;
+}
 .calevent a.il-downloader {
   color: inherit;
   font-size: 12px;
