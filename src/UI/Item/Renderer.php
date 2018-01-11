@@ -40,13 +40,4 @@ class Renderer extends DefaultRenderer {
 
 		return $default_renderer->render($dropzone);
 	}
-
-
-
-	/**
-	 * @inheritDoc
-	 */
-	protected function getTemplate($name, $purge_unfilled_vars, $purge_unused_blocks) {
-		return new \ilIndependentTemplate('', true, true);
-	}
 }

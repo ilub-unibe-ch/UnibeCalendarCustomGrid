@@ -76,11 +76,20 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 
 	public function delete()
 	{
+		global $DIC;
+
 		$this->initIDsFromRequest();
 
 		$file = new ilObjFile($this->getFileId());
+		$query = "DELETE FROM event_items ".
+				"WHERE event_id = ".$DIC->database()->quote($this->getObjId() ,'integer').
+				" AND item_id = ".$DIC->database()->quote($this->getFileId() ,'integer')." ";
+		$DIC->database()->manipulate($query);
 		$file->delete();
-		echo $file->getTitle()." Deleted";
+		$session = new ilObjSession($this->ref_id);
+		echo json_encode(['message'=> $file->getTitle()." Deleted",
+				'file_title'=>$file->getTitle(),
+				'session_title'=> $session->getTitle()]);
 		exit;
 	}
 
