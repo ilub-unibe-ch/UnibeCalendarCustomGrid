@@ -1,7 +1,6 @@
 <?php
 
-namespace SRAG\Plugins\UnibeCalendarCustomGrid\Ctrl;
-
+namespace iLub\Plugin\UnibeCalendarCustomGrid\Ctrl;
 
 /**
  * Class DIC

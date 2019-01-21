@@ -6,5 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'SRAG\\Plugins\\UnibeCalendarCustomGrid\\' => array($baseDir . '/src'),
+    'iLub\\Plugin\\UnibeCalendarCustomGrid\\' => array($baseDir . '/src'),
 );

@@ -1,13 +1,14 @@
 <?php
-
-use SRAG\Plugins\UnibeCalendarCustomGrid\Ctrl\CtrlAware;
-use SRAG\Plugins\UnibeCalendarCustomGrid\Ctrl\ICtrlAware;
-use ILIAS\FileUpload\Processor\FilenameOverridePreProcessor;
+use iLub\Plugin\UnibeCalendarCustomGrid\Ctrl\CtrlAware;
+use iLub\Plugin\UnibeCalendarCustomGrid\Ctrl\ICtrlAware;
+use iLub\Plugin\UnibeCalendarCustomGrid\FileUploadProcessor\FilenameOverride;
 
 require_once('./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/vendor/autoload.php');
 
 /**
  * Class ilUnibeFileHandlerGUI
+ *
+ * @author Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  *
  * @ilCtrl_isCalledBy ilUnibeFileHandlerGUI: ilUIPluginRouterGUI
  */
@@ -159,7 +160,7 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 
 		$upload = $DIC->upload();
 		if($_POST["customFileName"]){
-			$upload->register(new FilenameOverridePreProcessor($_POST["customFileName"]));
+			$upload->register(new FilenameOverride($_POST["customFileName"]));
 		}
 
 		try {

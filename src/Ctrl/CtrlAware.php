@@ -1,6 +1,6 @@
 <?php
 
-namespace SRAG\Plugins\UnibeCalendarCustomGrid\Ctrl;
+namespace iLub\Plugin\UnibeCalendarCustomGrid\Ctrl;
 
 /**
  * Class Ctrl
@@ -8,7 +8,7 @@ namespace SRAG\Plugins\UnibeCalendarCustomGrid\Ctrl;
  * Provides base fucntionality which is needed when implementing controller classes in ILIAS using
  * ilCtrl
  *
- * @author Fabian Schmid <fs@studer-raimann.ch>
+ * @author Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  */
 trait CtrlAware {
 

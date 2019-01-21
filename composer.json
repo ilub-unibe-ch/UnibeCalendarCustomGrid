@@ -13,7 +13,7 @@
   "require": {},
   "autoload": {
     "psr-4": {
-      "SRAG\\Plugins\\UnibeCalendarCustomGrid\\": "src/"
+      "iLub\\Plugin\\UnibeCalendarCustomGrid\\": "src/"
     },
     "classmap": [
       "classes",

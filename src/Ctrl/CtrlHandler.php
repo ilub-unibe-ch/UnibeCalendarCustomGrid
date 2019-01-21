@@ -1,11 +1,11 @@
 <?php
 
-namespace SRAG\Plugins\UnibeCalendarCustomGrid\Ctrl;
+namespace iLub\Plugin\UnibeCalendarCustomGrid\Ctrl;
 
 /**
  * Class CtrlHandler
  *
- * @author Fabian Schmid <fs@studer-raimann.ch>
+ * @author Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  */
 trait CtrlHandler {
 

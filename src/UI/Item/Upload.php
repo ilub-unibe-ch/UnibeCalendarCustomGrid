@@ -1,14 +1,17 @@
 <?php
 
-namespace SRAG\Plugins\UnibeCalendarCustomGrid\UI\Item;
+namespace iLub\Plugin\UnibeCalendarCustomGrid\UI\Item;
 
 use ILIAS\UI\Component\Item\Standard;
 use ILIAS\UI\Implementation\Component\Item\Item;
+use ILIAS\UI\Component\Image\Image;
+use iLub\Plugin\UnibeCalendarCustomGrid\UI\Item\Upload as DefaultUpload;
+
 
 /**
  * Class Upload
  *
- * @author Fabian Schmid <fs@studer-raimann.ch>
+ * @author Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  */
 class Upload extends Item implements Standard {
 
@@ -16,6 +19,8 @@ class Upload extends Item implements Standard {
 	 * @var string
 	 */
 	protected $upload_url = '';
+
+	protected $visible = true;
 
 	/**
 	 * @param Item $item
@@ -37,7 +42,7 @@ class Upload extends Item implements Standard {
 			$clone = $clone->withActions($item->getActions());
 		}
 		if ($item->getLead()) {
-			if($item->getLead() instanceof ILIAS\UI\Component\Image\Image){
+			if($item->getLead() instanceof Image){
 				$clone = $clone->withLeadImage($item->getLead());
 			}else{
 				$clone = $clone->withLeadText($item->getLead());
@@ -63,7 +68,7 @@ class Upload extends Item implements Standard {
 			$item = $item->withActions($this->getActions());
 		}
 		if ($this->getLead()) {
-			if($this->getLead() instanceof ILIAS\UI\Component\Image\Image){
+			if($this->getLead() instanceof Image){
 				$item = $item->withLeadImage($this->getLead());
 			}else{
 				$item = $item->withLeadText($this->getLead());
@@ -78,7 +83,7 @@ class Upload extends Item implements Standard {
 	/**
 	 * @param $url
 	 *
-	 * @return \SRAG\Plugins\UnibeCalendarCustomGrid\UI\Item\Upload
+	 * @return DefaultUpload
 	 */
 	public function withUploadURL($url) {
 		$clone = clone $this;
@@ -93,5 +98,24 @@ class Upload extends Item implements Standard {
 	 */
 	public function getUploadUrl() {
 		return $this->upload_url;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isVisible(): bool
+	{
+		return $this->visible;
+	}
+
+	/**
+	 * @param bool $visible
+	 * @return Upload
+	 */
+	public function setVisible(bool $visible)
+	{
+		$clone = clone $this;
+		$clone->visible = $visible;
+		return $clone;
 	}
 }

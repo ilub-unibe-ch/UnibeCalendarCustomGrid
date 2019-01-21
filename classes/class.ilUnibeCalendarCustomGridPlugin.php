@@ -1,11 +1,13 @@
 <?php
 
-use SRAG\Plugins\UnibeCalendarCustomGrid\UI\Item\Upload;
+use iLub\Plugin\UnibeCalendarCustomGrid\UI\Item\Upload;
 
 require_once('./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/vendor/autoload.php');
 
 /**
  * Class ilUnibeCalendarCustomGridPlugin
+ *
+ * @author Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  */
 class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 
@@ -47,10 +49,32 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 			});
 
 			$wrapper= $wrapper->withUserDefinedFileNamesEnabled(true);
-			return "<span>".$renderer->render($wrapper)."</span>";
+			$invisible_html = "";
+			if(!$this->isVisible()){
+				$invisible_html = "class='ilCalendarEntryInvisible'";
+			}
+			return "<span $invisible_html>".$renderer->render($wrapper)."</span>";
 		}
 
 		return $a_content;
+	}
+	/**
+	 * @return bool
+	 */
+	public function isVisible(){
+		if($this->isSession() && !$this->isSessionMember()){
+			return false;
+		}
+		return true;
+	}
+
+	protected function isSessionMember(){
+		global $DIC;
+
+		$session_ref_id = array_pop(ilObject::_getAllReferences($this->getCategory()->getObjId()));
+		$session = new ilObjSession($session_ref_id);
+		$members = $session->getMembersObject();
+		return $members->isMember($DIC->user()->getId());
 	}
 
 	/**
@@ -99,9 +123,6 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 
 	protected function getMetaDataHtml(){
 		global $DIC;
-
-		$renderer = $DIC->ui()->renderer();
-		$factory = $DIC->ui()->factory();
 
 		$meta_html = "";
 
@@ -162,11 +183,17 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 * @return \ILIAS\UI\Component\Item\Item
 	 */
 	public function editAgendaItem(\ILIAS\UI\Component\Item\Item $a_item) {
-		if ($this->isSession() && $this->checkWriteAccess()) {
+		if($this->isSession() ){
 			$upload_item = (new Upload($a_item->getTitle()))->withUploadURL($this->getUploadURL());
-			$upload_item = $upload_item->copyFromItem($a_item);
+
+			$upload_item = $upload_item->setVisible($this->isSessionMember());
+			if ($this->checkWriteAccess()) {
+				$upload_item = $upload_item->copyFromItem($a_item);
+			}
 			return $upload_item;
+
 		}
+
 
 		return $a_item;
 	}
@@ -205,6 +232,12 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 			$DIC->ui()
 					->mainTemplate()
 					->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/deleteFile.js");
+			$DIC->ui()
+				->mainTemplate()
+				->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/hideEntries.js");
+			$DIC->ui()
+				->mainTemplate()
+				->addOnLoadCode("il.Unibe.hideEntries()");
 			$init = true;
 		}
 	}

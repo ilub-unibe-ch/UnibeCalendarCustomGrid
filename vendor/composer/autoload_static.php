@@ -7,14 +7,14 @@ namespace Composer\Autoload;
 class ComposerStaticInit11b911b17e133b1b4ed974c8c86fc757
 {
     public static $prefixLengthsPsr4 = array (
-        'S' => 
+        'i' => 
         array (
-            'SRAG\\Plugins\\UnibeCalendarCustomGrid\\' => 37,
+            'iLub\\Plugin\\UnibeCalendarCustomGrid\\' => 36,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'SRAG\\Plugins\\UnibeCalendarCustomGrid\\' => 
+        'iLub\\Plugin\\UnibeCalendarCustomGrid\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),
@@ -45,10 +45,8 @@ class ComposerStaticInit11b911b17e133b1b4ed974c8c86fc757
         'ilAppointmentSessionFileHandler' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/FileHandler/class.ilAppointmentSessionFileHandler.php',
         'ilAuthCalendar' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilAuthCalendar.php',
         'ilAuthCalendarToken' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilAuthCalendarToken.php',
-        'ilAuthContainerCalendarToken' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilAuthContainerCalendarToken.php',
         'ilCalCategoriesInitializedMultipleException' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/exceptions/class.ilCalCategoriesInitializedMultipleException.php',
         'ilCalCategoriesNotInitializedException' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/exceptions/class.ilCalCategoriesNotInitializedException.php',
-        'ilCalFileZipJob' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/FileHandler/class.ilCalFileZipJob.php',
         'ilCalendarActions' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilCalendarActions.php',
         'ilCalendarAgendaListGUI' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/Agenda/class.ilCalendarAgendaListGUI.php',
         'ilCalendarAppEventListener' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilCalendarAppEventListener.php',
@@ -78,6 +76,7 @@ class ComposerStaticInit11b911b17e133b1b4ed974c8c86fc757
         'ilCalendarExport' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/Export/class.ilCalendarExport.php',
         'ilCalendarExporter' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilCalendarExporter.php',
         'ilCalendarFileHandler' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/FileHandler/class.ilCalendarFileHandler.php',
+        'ilCalendarGlobalScreenProvider' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilCalendarGlobalScreenProvider.php',
         'ilCalendarHeaderNavigationGUI' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilCalendarHeaderNavigationGUI.php',
         'ilCalendarImporter' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilCalendarImporter.php',
         'ilCalendarInboxGUI' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilCalendarInboxGUI.php',
@@ -165,6 +164,9 @@ class ComposerStaticInit11b911b17e133b1b4ed974c8c86fc757
         'ilObjCalendarSettingsGUI' => __DIR__ . '/../..' . '/../../../../../../../Services/Calendar/classes/class.ilObjCalendarSettingsGUI.php',
         'ilObjFile' => __DIR__ . '/../..' . '/../../../../../../../Modules/File/classes/class.ilObjFile.php',
         'ilObjFileAccess' => __DIR__ . '/../..' . '/../../../../../../../Modules/File/classes/class.ilObjFileAccess.php',
+        'ilObjFileAccessSettings' => __DIR__ . '/../..' . '/../../../../../../../Modules/File/classes/class.ilObjFileAccessSettings.php',
+        'ilObjFileAccessSettingsAccess' => __DIR__ . '/../..' . '/../../../../../../../Modules/File/classes/class.ilObjFileAccessSettingsAccess.php',
+        'ilObjFileAccessSettingsGUI' => __DIR__ . '/../..' . '/../../../../../../../Modules/File/classes/class.ilObjFileAccessSettingsGUI.php',
         'ilObjFileGUI' => __DIR__ . '/../..' . '/../../../../../../../Modules/File/classes/class.ilObjFileGUI.php',
         'ilObjFileListGUI' => __DIR__ . '/../..' . '/../../../../../../../Modules/File/classes/class.ilObjFileListGUI.php',
         'ilObjSession' => __DIR__ . '/../..' . '/../../../../../../../Modules/Session/classes/class.ilObjSession.php',
@@ -180,6 +182,7 @@ class ComposerStaticInit11b911b17e133b1b4ed974c8c86fc757
         'ilSessionFileTableGUI' => __DIR__ . '/../..' . '/../../../../../../../Modules/Session/classes/class.ilSessionFileTableGUI.php',
         'ilSessionImporter' => __DIR__ . '/../..' . '/../../../../../../../Modules/Session/classes/class.ilSessionImporter.php',
         'ilSessionLP' => __DIR__ . '/../..' . '/../../../../../../../Modules/Session/classes/class.ilSessionLP.php',
+        'ilSessionMailTemplateParticipantContext' => __DIR__ . '/../..' . '/../../../../../../../Modules/Session/classes/class.ilSessionMailTemplateParticipantContext.php',
         'ilSessionMaterialsTableGUI' => __DIR__ . '/../..' . '/../../../../../../../Modules/Session/classes/class.ilSessionMaterialsTableGUI.php',
         'ilSessionMembershipGUI' => __DIR__ . '/../..' . '/../../../../../../../Modules/Session/classes/class.ilSessionMembershipGUI.php',
         'ilSessionMembershipMailNotification' => __DIR__ . '/../..' . '/../../../../../../../Modules/Session/classes/class.ilSessionMembershipMailNotification.php',
