@@ -43,6 +43,6 @@ class Renderer extends DefaultRenderer {
 		});
 		$dropzone= $dropzone->withUserDefinedFileNamesEnabled(true);
 
-		return "<div class='ilCalendarEntryVisible'>".$default_renderer->render($dropzone)."</div>";
+		return $default_renderer->render($dropzone);
 	}
 }

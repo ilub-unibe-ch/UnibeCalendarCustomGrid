@@ -20,8 +20,6 @@ class Upload extends Item implements Standard {
 	 */
 	protected $upload_url = '';
 
-	protected $visible = true;
-
 	/**
 	 * @param Item $item
 	 * @return \ILIAS\UI\Component\Item\Item|Item|Upload
@@ -98,24 +96,5 @@ class Upload extends Item implements Standard {
 	 */
 	public function getUploadUrl() {
 		return $this->upload_url;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function isVisible(): bool
-	{
-		return $this->visible;
-	}
-
-	/**
-	 * @param bool $visible
-	 * @return Upload
-	 */
-	public function setVisible(bool $visible)
-	{
-		$clone = clone $this;
-		$clone->visible = $visible;
-		return $clone;
 	}
 }

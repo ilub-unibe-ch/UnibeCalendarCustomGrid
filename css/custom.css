@@ -1,7 +1,6 @@
-.ilCalendarEntryInvisible{
+.createhover .glyph{
   display: none;
 }
-
 .calevent .il-dropzone .il_calevent > :not(span) a {
   color: inherit;
   font-size: 12px;
