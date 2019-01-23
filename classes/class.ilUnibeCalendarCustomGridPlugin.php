@@ -210,12 +210,6 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 			$DIC->ui()
 					->mainTemplate()
 					->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/deleteFile.js");
-			$DIC->ui()
-				->mainTemplate()
-				->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/hideEntries.js");
-			$DIC->ui()
-				->mainTemplate()
-				->addOnLoadCode("il.Unibe.hideEntries()");
 			$init = true;
 		}
 	}
