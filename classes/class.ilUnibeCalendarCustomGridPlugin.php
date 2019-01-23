@@ -11,6 +11,11 @@ require_once('./Customizing/global/plugins/Services/Calendar/AppointmentCustomGr
  */
 class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 
+    /**
+     * ilCalendarCategory []
+     */
+    protected $categories = [];
+
 	/**
 	 * @return    string    Plugin Name
 	 */
@@ -18,10 +23,6 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 		return "UnibeCalendarCustomGrid";
 	}
 
-	/**
-	 * ilCalendarCategory []
-	 */
-	protected $categories = [];
 
 	/**
 	 * Replace the whole appointment presentation in the grid.
@@ -38,6 +39,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 
 		$renderer = $DIC->ui()->renderer();
 		$factory = $DIC->ui()->factory();
+        $this->initJSAndCSS();
 
 		if ($this->isSession() && $this->checkWriteAccess()) {
 
@@ -62,12 +64,8 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	public function checkWriteAccess(){
 		global $DIC;
 
-		$system = $DIC->rbac()->system();
-
 		$ref_id = array_pop(ilObject::_getAllReferences($this->getCategory()->getObjId()));
-
-		return $system->checkAccess("manage_materials",$ref_id);
-
+		return $DIC->rbac()->system()->checkAccess("manage_materials",$ref_id,"sess");
 	}
 
 
@@ -75,15 +73,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 * @return bool
 	 */
 	private function isSession() {
-		$cat = $this->getCategory();
-
-		$is_session = $cat->getObjType() === "sess";
-
-		if ($is_session) {
-			$this->initJSAndCSS();
-		}
-
-		return $is_session;
+		return $this->getCategory()->getObjType() === "sess";
 	}
 
 
