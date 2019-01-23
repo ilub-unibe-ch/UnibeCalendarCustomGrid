@@ -18,14 +18,9 @@ class Renderer extends DefaultRenderer {
 	 * @inheritDoc
 	 */
 	public function render(Component\Component $component, RendererInterface $default_renderer) {
-		if(!$component->isVisible()){
-			return "<div class='ilCalendarEntryInvisible'></div>";
-		}
 		/**
 		 * @var $component DefaultUpload
 		 */
-		$f = $this->getUIFactory();
-
 		//Build original standard item
 		$f = $this->getUIFactory();
 		$item = $f->item()->standard($component->getTitle());
@@ -41,7 +36,7 @@ class Renderer extends DefaultRenderer {
 		$dropzone = $dropzone->withAdditionalOnLoadCode(function($id){
 			return "il.Unibe.customizeWrapper($id)";
 		});
-		$dropzone= $dropzone->withUserDefinedFileNamesEnabled(true);
+		$dropzone = $dropzone->withUserDefinedFileNamesEnabled(true);
 
 		return $default_renderer->render($dropzone);
 	}
