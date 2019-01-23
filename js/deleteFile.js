@@ -2,6 +2,7 @@ var il = il || {};
 il.Unibe = il.Unibe || {};
 
 il.Unibe.deleteFile = function(element, url){
+
     $.ajax(url)
         .done(function(data) {
             data = JSON.parse(data);
@@ -10,7 +11,7 @@ il.Unibe.deleteFile = function(element, url){
             var $listing_file_property = null;
             if(is_listing){
                 $listing_file_property = $(".il-item .btn:contains("+data.session_title+")")
-                    .parents('.il-item').find(".btn-link:contains("+data.file_title+")").parent();
+                    .parents('.il-item').find(".il-item-property-value a:contains("+data.file_title+")").parent();
             }
 
             if(was_last_file){
