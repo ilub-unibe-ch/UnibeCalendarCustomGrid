@@ -16,11 +16,24 @@ use ILIAS\FileUpload\Processor\PreProcessor;
  * @version 1.0.0
  */
 final class FilenameOverride implements PreProcessor {
-	/**
+
+    /**
+     * @var string
+     */
+    protected $filename;
+    /**
+     * FilenameOverride constructor.
+     * @param string $filename
+     */
+    public function __construct(string $filename){
+        $this->filename = $filename;
+    }
+
+    /**
 	 * @inheritDoc
 	 */
 	public function process(FileStream $stream, Metadata $metadata) {
-		$metadata->setFilename(Util::normalizeRelativePath($metadata->getFilename()));
+		$metadata->setFilename(Util::normalizeRelativePath($this->filename));
 		return new ProcessingStatus(ProcessingStatus::OK, 'Filename changed');
 	}
 }

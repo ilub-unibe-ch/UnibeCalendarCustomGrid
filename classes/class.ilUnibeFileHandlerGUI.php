@@ -159,6 +159,7 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 		$this->initIDsFromRequest();
 
 		$upload = $DIC->upload();
+
 		if($_POST["customFileName"]){
 			$upload->register(new FilenameOverride($_POST["customFileName"]));
 		}
