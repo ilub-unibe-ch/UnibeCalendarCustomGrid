@@ -2,9 +2,15 @@ var il = il || {};
 il.Unibe = il.Unibe || {};
 
 il.Unibe.deleteFile = function(element, url){
+    var was_last_file = $(".modal .il-unibe-file").length===1;
+    if(was_last_file){
+        $(element).parents(".ilInfoScreenSec").hide();
+    }
+    $(element).parents(".il-unibe-file").hide();
 
     $.ajax(url)
         .done(function(data) {
+
             data = JSON.parse(data);
             var is_listing = $(element).parents(".il_calevent").length == 0;
             var was_last_file = $(".modal .il-unibe-file").length===1;
@@ -23,15 +29,15 @@ il.Unibe.deleteFile = function(element, url){
                 $(element).parents(".ilInfoScreenSec").remove();
             }else{
                 if(is_listing){
-                    $listing_file_property.find(".btn-link:contains("+data.file_title+")").remove();
+                    $listing_file_property.find("a:contains("+data.file_title+")").remove();
                     var link_list_html = $listing_file_property.html();
                     link_list_html = link_list_html.replace(", ,",", ");
                     link_list_html = link_list_html.replace(/^,|,$/g,'');
                     $listing_file_property.html(link_list_html);
 
                 }
-                $(element).parents(".il-unibe-file").remove();
             }
+            $(element).parents(".il-unibe-file").remove();
 
         })
         .fail(function(data) {
