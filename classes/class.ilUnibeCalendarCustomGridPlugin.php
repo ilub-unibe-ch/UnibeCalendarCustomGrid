@@ -187,7 +187,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 		if(!$row){
 			return false;
 		}
-		return $this->getAppointment()->getStart()." ". $row['value'];
+		return $this->getAppointment()->getStart()->get(IL_CAL_FKT_DATE,"G:i")." ". $row['value'];
 	}
 
 
