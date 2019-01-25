@@ -31,10 +31,11 @@ il.Unibe.deleteFile = function(element, url){
                 if(is_listing){
                     $listing_file_property.find("a:contains("+data.file_title+")").remove();
                     var link_list_html = $listing_file_property.html();
-                    link_list_html = link_list_html.replace(", ,",", ");
-                    link_list_html = link_list_html.replace(/^,|,$/g,'');
-                    $listing_file_property.html(link_list_html);
-
+                    if(link_list_html){
+                        link_list_html = link_list_html.replace(", ,",", ");
+                        link_list_html = link_list_html.replace(/^,|,$/g,'');
+                        $listing_file_property.html(link_list_html);
+                    }
                 }
             }
             $(element).parents(".il-unibe-file").remove();
