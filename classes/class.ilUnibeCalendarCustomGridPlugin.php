@@ -84,23 +84,17 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 
 		$content = "";
 		$content .= $this->getFilesHtml();
-		$content .= $this->getMetaDataHtml();
+		$content .= $this->getMetaDozentenDataHtml();
 
 		return $content;
 
 	}
 
-	protected function getMetaDataHtml(){
-		global $DIC;
+	protected function getMetaDozentenDataHtml(){
 
 		$meta_html = "";
 
-		$obj_id = $this->getCategory()->getObjId();
-		$query = "SELECT val.value
-			FROM adv_md_values_text as val
-			INNER JOIN adv_mdf_definition as def ON  val.field_id = def.field_id
-			WHERE def.title = 'Dozierende' AND val.obj_id = $obj_id";
-		$res = $DIC->database()->query($query);
+		$res = $this->getMetaDataValueByTitle('Dozierende');
 
 		if($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
@@ -121,6 +115,21 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 		}
 
 		return $meta_html;
+	}
+
+	/**
+	 * @param string $title
+	 * @return ilPDOStatement
+	 */
+	protected function getMetaDataValueByTitle(string $title){
+		global $DIC;
+
+		$obj_id = $this->getCategory()->getObjId();
+		$query = "SELECT val.value
+			FROM adv_md_values_text as val
+			INNER JOIN adv_mdf_definition as def ON  val.field_id = def.field_id
+			WHERE def.title = '$title' AND val.obj_id = $obj_id";
+		return $DIC->database()->query($query);
 	}
 
 	protected function getFilesHtml(){
@@ -170,10 +179,15 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 
 
 	/**
-	 * @return string
+	 * @return bool|string
+	 * @throws ilDatabaseException
 	 */
 	public function editShyButtonTitle() {
-		return false;
+		$row = $this->getMetaDataValueByTitle("Kurzbezeichnung")->fetchRow();
+		if(!$row){
+			return false;
+		}
+		return $this->getAppointment()->getStart()." ". $row['value'];
 	}
 
 
