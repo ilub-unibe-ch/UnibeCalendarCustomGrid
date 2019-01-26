@@ -183,11 +183,19 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 * @throws ilDatabaseException
 	 */
 	public function editShyButtonTitle() {
+	    global $DIC;
 		$row = $this->getMetaDataValueByTitle("Kurzbezeichnung")->fetchRow();
 		if(!$row){
 			return false;
 		}
-		return $this->getAppointment()->getStart()->get(IL_CAL_FKT_DATE,"G:i")." ". $row['value'];
+		$start_time = $this->getAppointment()->getStart()->get(IL_CAL_FKT_DATE,"G:i");
+		$end_time = $this->getAppointment()->getEnd()->get(IL_CAL_FKT_DATE,"G:i");
+		if($DIC->ctrl()->getCmdClass()!="ilcalendardaygui"){
+            return $start_time."-".$end_time.": ". $row['value'];
+        }else{
+            return $start_time."-".$end_time.": ". $this->getAppointment()->getTitle().", ".$row['value'];
+        }
+
 	}
 
 

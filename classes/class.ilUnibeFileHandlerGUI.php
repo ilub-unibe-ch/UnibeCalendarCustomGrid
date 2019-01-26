@@ -181,11 +181,13 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 	}
 
 
-	/**
-	 * @param string $tempname
-	 * @param \ILIAS\FileUpload\DTO\UploadResult $result
-	 * @return string
-	 */
+    /**
+     * @param string $tempname
+     * @param \ILIAS\FileUpload\DTO\UploadResult $result
+     * @return string
+     * @throws \ILIAS\FileUpload\Collection\Exception\NoSuchElementException
+     * @throws \ILIAS\FileUpload\Exception\IllegalStateException
+     */
 	private function handleFileUpload(string $tempname, \ILIAS\FileUpload\DTO\UploadResult $result) {
 		global $DIC;
 
