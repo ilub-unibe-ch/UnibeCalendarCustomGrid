@@ -161,7 +161,7 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 		$upload = $DIC->upload();
 
 		if($_POST["customFileName"]){
-			$upload->register(new FilenameOverride($_POST["customFileName"]));
+			$upload->register(new FilenameOverride($this->customConvertToASCII($_POST["customFileName"])));
 		}
 
 		try {
@@ -180,6 +180,32 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 		exit();
 	}
 
+
+	/**
+	 * See Issue: http://ilublx3.unibe.ch:8080/mantis/view.php?id=1368
+	 * @param string $filename
+	 * @return mixed|null|string|string[]
+	 */
+	public function customConvertToASCII(string $filename){
+		$umlautsI = array("Ä"=>"Ae", "Ö"=>"Oe", "Ü"=>"Ue",
+			"ä"=>"ae", "ö"=>"oe", "ü"=>"ue", "ß"=>"ss");
+		foreach($umlautsI as $src => $tgt)
+		{
+			$filename = str_replace($src, $tgt, $filename);
+		}
+
+		$filename = mb_convert_encoding($filename,"ASCII");
+
+		$umlautsII = array("A?"=>"Ae", "O?"=>"Oe", "U?"=>"Ue",
+			"a?"=>"ae", "o?"=>"oe", "u?"=>"ue", "s?"=>"ss");
+		foreach($umlautsII as $src => $tgt)
+		{
+			$filename = str_replace($src, $tgt, $filename);
+		}
+
+		return $filename;
+
+	}
 
     /**
      * @param string $tempname
