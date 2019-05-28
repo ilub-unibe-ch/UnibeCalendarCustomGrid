@@ -163,14 +163,9 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	public function editAgendaItem(\ILIAS\UI\Component\Item\Item $a_item) {
         $this->initJSAndCSS();
 
-        if($this->isSession() ){
+        if($this->isSession() &&  $this->checkWriteAccess()){
 			$upload_item = (new Upload($a_item->getTitle()))->withUploadURL($this->getUploadURL());
-
-			if ($this->checkWriteAccess()) {
-				$upload_item = $upload_item->copyFromItem($a_item);
-			}
-			return $upload_item;
-
+			return $upload_item->copyFromItem($a_item);
 		}
 
 
