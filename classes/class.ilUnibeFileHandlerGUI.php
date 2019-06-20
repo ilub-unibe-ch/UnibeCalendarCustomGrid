@@ -116,18 +116,20 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 		$this->initIDsFromRequest();
 
 		$session = new ilObjSession($this->ref_id);
-		$download_name = $session->getTitle().".zip";
 		$event_items = (ilObjectActivation::getItemsByEvent($this->obj_id));
+
+		$files_count = 0;
+		$file_path = "";
+		$file = null;
 
 		if (count($event_items)) {
 			$temp_folder_name = "calendarout/".uniqid();
 			$temp = $DIC->filesystem()->storage();
 			$store = $DIC->filesystem()->storage();
 			foreach ($event_items as $item) {
-
 				if ($item['type'] == "file") {
+					$files_count++;
 					$file = new ilObjFile($item['ref_id']);
-					//var_dump($file);
 					$file_name =  $file->getFileName();
 					$file_path = $file->getDirectory($file->getVersion())."/".$file_name;
 					$rel_file_path = str_replace(CLIENT_DATA_DIR,"",$file_path);
@@ -141,12 +143,20 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 				}
 			}
 
+			if($files_count == 1){
+				$temp->deleteDir($temp_folder_name);
+				ilFileDelivery::deliverFileAttached($file_path,$file->getFileName(),$file->getFileType(),false);
+			}else{
+				$download_name = $session->getTitle().".zip";
+				$tmp_zip_folder = CLIENT_DATA_DIR."/".$temp_folder_name;
+				$tmp_zip_file = $tmp_zip_folder.".zip";
+				ilUtil::zip($tmp_zip_folder,$tmp_zip_file,true);
+				$temp->deleteDir($temp_folder_name);
+				ilFileDelivery::deliverFileAttached($tmp_zip_file,$download_name,'',true);
 
-			$tmp_zip_folder = CLIENT_DATA_DIR."/".$temp_folder_name;
-			$tmp_zip_file = $tmp_zip_folder.".zip";
-			ilUtil::zip($tmp_zip_folder,$tmp_zip_file,true);
-			$temp->deleteDir($temp_folder_name);
-			ilFileDelivery::deliverFileAttached($tmp_zip_file,$download_name,'',true);
+			}
+
+
 
 		}
 	}
