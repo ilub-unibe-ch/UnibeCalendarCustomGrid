@@ -1,4 +1,4 @@
-.createhover .glyph{
+.createhover .glyph {
   display: none;
 }
 .calevent .il-dropzone .il_calevent > :not(span) a {
@@ -15,14 +15,16 @@
 .calevent a.il-downloader {
   color: inherit;
   font-size: 12px;
+  color: #333;
+}
+.calevent a.il-downloader :hover {
+  color: black;
 }
 .il_calevent {
   position: relative;
 }
 .il_calevent .il-downloader .glyphicon {
-  position: absolute;
-  top: 5px;
-  right: 5px;
+  float: right;
 }
 .il_calevent > a.btn-link:first-child {
   display: inline;
