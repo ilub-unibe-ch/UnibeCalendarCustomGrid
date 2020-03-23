@@ -150,7 +150,7 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 				$download_name = $session->getTitle().".zip";
 				$tmp_zip_folder = CLIENT_DATA_DIR."/".$temp_folder_name;
 				$tmp_zip_file = $tmp_zip_folder.".zip";
-				ilUtil::zip($tmp_zip_folder,$tmp_zip_file,true);
+				ilUtil::zip($tmp_zip_folder,$tmp_zip_file);
 				$temp->deleteDir($temp_folder_name);
 				ilFileDelivery::deliverFileAttached($tmp_zip_file,$download_name,'',true);
 
