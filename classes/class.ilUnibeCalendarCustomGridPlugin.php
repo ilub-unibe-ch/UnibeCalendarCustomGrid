@@ -83,7 +83,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	public function addExtraContent() {
 
 		$content = "";
-		$content .= $this->getFilesHtml();
+		//$content .= $this->getFilesHtml();
 		$content .= $this->getMetaDozentenDataHtml();
 
 		return $content;
@@ -138,7 +138,9 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 
 		$file_handler = new ilUnibeFileHandlerGUI();
 		if($file_handler->hasFiles($obj_id)){
-			$url = $file_handler->buildDownloadURL($obj_id);
+            return  "<span class='il-downloader'><div class=\"glyphicon glyphicon-download-alt\" aria-hidden=\"true\"></div></span>";
+
+            $url = $file_handler->buildDownloadURL($obj_id);
 			return  "<a class='il-downloader' href='$url'><div class=\"glyphicon glyphicon-download-alt\" aria-hidden=\"true\"></div></a>";
 
 		}
@@ -179,16 +181,18 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	 */
 	public function editShyButtonTitle() {
 	    global $DIC;
-		$row = $this->getMetaDataValueByTitle("Kurzbezeichnung")->fetchRow();
-		if(!$row){
-			return false;
+	    $files_glyph = $this->getFilesHtml();
+		$short_title = $this->getMetaDataValueByTitle("Kurzbezeichnung")->fetchRow();
+		if(!$short_title){
+            return $this->getAppointment()->getTitle().$files_glyph;
 		}
+
 		$start_time = $this->getAppointment()->getStart()->get(IL_CAL_FKT_DATE,"G:i");
 		$end_time = $this->getAppointment()->getEnd()->get(IL_CAL_FKT_DATE,"G:i");
 		if($DIC->ctrl()->getCmdClass()!="ilcalendardaygui"){
-            return $start_time."-".$end_time.": ". $row['value'];
+            return $start_time."-".$end_time.": ". $short_title['value'].$files_glyph;
         }else{
-            return $start_time."-".$end_time.": ". $this->getAppointment()->getTitle().", ".$row['value'];
+            return $start_time."-".$end_time.": ". $this->getAppointment()->getTitle().", ".$short_title['value'].$files_glyph;;
         }
 
 	}

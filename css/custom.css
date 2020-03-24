@@ -23,6 +23,9 @@
 .il_calevent {
   position: relative;
 }
+.il_calevent > .btn-link {
+  width: 100%;
+}
 .il_calevent .il-downloader .glyphicon {
   float: right;
 }
