@@ -24,7 +24,7 @@ trait CtrlAware {
 		if ($this->handleNextClass($this)) {
 			return true;
 		}
-		$this->tpl()->getStandardTemplate();
+
 		$cmd = $this->ctrl()->getCmd();
 		if ($this->getActiveTabId()) {
 			$this->tabs()->activateTab($this->getActiveTabId());
