@@ -3,9 +3,7 @@
 namespace iLub\Plugin\UnibeCalendarCustomGrid\UI\Item;
 
 use ILIAS\UI\Implementation\Component\Item\Standard;
-use ILIAS\UI\Component\Item\Item;
-use ILIAS\UI\Component\Image\Image;
-use iLub\Plugin\UnibeCalendarCustomGrid\UI\Item\Upload as DefaultUpload;
+use ILIAS\UI\Component\Item\Standard as StandardItem;
 
 
 /**
@@ -13,7 +11,7 @@ use iLub\Plugin\UnibeCalendarCustomGrid\UI\Item\Upload as DefaultUpload;
  *
  * @author Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  */
-class Upload extends  Standard implements Item {
+class Upload extends  Standard implements StandardItem {
 
 	/**
 	 * @var string
@@ -21,10 +19,10 @@ class Upload extends  Standard implements Item {
 	protected $upload_url = '';
 
 	/**
-	 * @param Item $item
-	 * @return \ILIAS\UI\Component\Item\Item|Item|Upload
+	 * @param StandardItem $item
+	 * @return Upload
 	 */
-	public function copyFromItem(Item $item){
+	public function copyFromItem(StandardItem $item){
 		$clone = clone $this;
 
 		if (is_array($item->getProperties())) {
@@ -33,6 +31,12 @@ class Upload extends  Standard implements Item {
 		if ($item->getDescription()) {
 			$clone = $clone->withDescription($item->getDescription());
 		}
+        if ($item->getColor()) {
+            $clone = $clone->withColor($item->getColor());
+        }
+        if ($item->getLead()) {
+            $clone = $clone->withLeadText($item->getLead());
+        }
 		if ($item->getActions()) {
 			$clone = $clone->withActions($item->getActions());
 		}
@@ -40,7 +44,7 @@ class Upload extends  Standard implements Item {
 		return $clone;
 	}
 
-	public function copyToItem(Item $item){
+	public function copyToItem(StandardItem $item){
 		if (is_array($this->getProperties())) {
 			$item = $item->withProperties($this->getProperties());
 		}
@@ -50,7 +54,12 @@ class Upload extends  Standard implements Item {
 		if ($this->getActions()) {
 			$item = $item->withActions($this->getActions());
 		}
-
+        if ($this->getColor()) {
+            $item = $item->withColor($this->getColor());
+        }
+        if ($this->getLead()) {
+            $item = $item->withLeadText($this->getLead());
+        }
 		return $item;
 	}
 
@@ -58,7 +67,7 @@ class Upload extends  Standard implements Item {
 	/**
 	 * @param $url
 	 *
-	 * @return DefaultUpload
+	 * @return Upload
 	 */
 	public function withUploadURL($url) {
 		$clone = clone $this;
