@@ -138,10 +138,10 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 
 		$file_handler = new ilUnibeFileHandlerGUI();
 		if($file_handler->hasFiles($obj_id)){
-            return  "<span class='il-downloader'><div class=\"glyphicon glyphicon-download-alt\" aria-hidden=\"true\"></div></span>";
+            //return  "<span class='il-downloader'><div class=\"glyphicon glyphicon-download-alt\" aria-hidden=\"true\"></div></span>";
 
             $url = $file_handler->buildDownloadURL($obj_id);
-			return  "<a class='il-downloader' href='$url'><div class=\"glyphicon glyphicon-download-alt\" aria-hidden=\"true\"></div></a>";
+			return  "</button><a class='il-downloader' href='$url'><div class=\"glyphicon glyphicon-download-alt\"></div></a>";
 
 		}
 

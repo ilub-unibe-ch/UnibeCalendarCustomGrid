@@ -25,9 +25,12 @@
 }
 .il_calevent > .btn-link {
   width: 100%;
+  padding-right: 18px;
 }
 .il_calevent .il-downloader .glyphicon {
-  float: right;
+  position: absolute;
+  right: 4px;
+  top: 4px;
 }
 .il_calevent > a.btn-link:first-child {
   display: inline;
@@ -44,7 +47,7 @@
 }
 .il-cal-month a.il-downloader {
   color: inherit;
-  font-size: 14px;
+  font-size: 12px;
 }
 .il-cal-month .il_cal_navigation {
   display: none;
