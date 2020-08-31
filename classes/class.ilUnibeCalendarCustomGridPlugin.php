@@ -202,28 +202,21 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 		static $init;
 		if (!$init) {
 			global $DIC;
-			$DIC->ui()
-			    ->mainTemplate()
-			    ->addJavaScript("./libs/bower/bower_components/jquery-dragster/jquery.dragster.js");
-			$DIC->ui()
-			    ->mainTemplate()
-			    ->addJavaScript("./libs/bower/bower_components/fine-uploader/dist/fine-uploader.core.min.js");
-			$DIC->ui()
-			    ->mainTemplate()
-			    ->addJavaScript("./src/UI/templates/js/Dropzone/File/uploader.js");
-			$DIC->ui()
-			    ->mainTemplate()
-			    ->addJavaScript("./src/UI/templates/js/Dropzone/File/dropzone.js");
-			$DIC->ui()
-					->mainTemplate()
-					->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/customizeWrapper.js");
-			$DIC->ui()
-					->mainTemplate()
-					->addCss("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/css/custom.css");
-			$DIC->ui()
-					->mainTemplate()
-					->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/deleteFile.js");
-			$init = true;
+
+			$tpl = $DIC->ui()->mainTemplate();
+            $tpl->addJavaScript("./libs/bower/bower_components/jquery-dragster/jquery.dragster.js");
+            $tpl->addJavaScript("./libs/bower/bower_components/fine-uploader/dist/fine-uploader.core.min.js");
+            $tpl->addJavaScript("./src/UI/templates/js/Dropzone/File/uploader.js");
+            $tpl->addJavaScript("./src/UI/templates/js/Dropzone/File/dropzone.js");
+            $tpl->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/customizeWrapper.js");
+            $tpl->addCss("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/css/custom.css");
+            $tpl->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/deleteFile.js");
+            $tpl->addCss("libs/bower/bower_components/openlayers/build/ol.css");
+            $tpl->addJavaScript("libs/bower/bower_components/openlayers/build/ol.js");
+            $tpl->addCss("Services/Maps/css/service_openlayers.css");
+            $tpl->addJavaScript("Services/Maps/js/ServiceOpenLayers.js");
+            $tpl->addJavaScript("Services/Maps/js/ServiceGoogleMaps.js");;
+            $init = true;
 		}
 	}
 
