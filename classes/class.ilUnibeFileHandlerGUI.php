@@ -131,7 +131,7 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 					$files_count++;
 					$file = new ilObjFile($item['ref_id']);
 					$file_name =  $file->getFileName();
-					$file_path = $file->getDirectory($file->getVersion())."/".$file_name;
+					$file_path = $file->getDirectory($file->getVersion())."/data";
 					$rel_file_path = str_replace(CLIENT_DATA_DIR,"",$file_path);
 					$stream = $store->readStream($rel_file_path);
 					$full_temp_path ="$temp_folder_name/$file_name";
