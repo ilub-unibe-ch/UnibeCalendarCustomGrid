@@ -214,8 +214,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
             $tpl->addCss("libs/bower/bower_components/openlayers/build/ol.css");
             $tpl->addJavaScript("libs/bower/bower_components/openlayers/build/ol.js");
             $tpl->addCss("Services/Maps/css/service_openlayers.css");
-            $tpl->addJavaScript("Services/Maps/js/ServiceOpenLayers.js");
-            $tpl->addJavaScript("Services/Maps/js/ServiceGoogleMaps.js");;
+            $tpl->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/ServiceOpenLayers.js");
             $init = true;
 		}
 	}

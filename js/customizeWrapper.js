@@ -11,12 +11,9 @@ il.Unibe.customizeWrapper = function(uploadId){
 };
 
 il.Unibe.loadMap = function(wrapper_id){
-    console.log(wrapper_id);
-    console.log(ilOLMapData);
     setTimeout(function() {
         let openLayer = ServiceOpenLayers.create(ol, jQuery, ilOLInvalidAddress, ilOLMapData, ilOLUserMarkers);
 
-        console.log(ilOLMapData);
         ilLookupAddress = function (id, address) {
             return openLayer.jumpToAddress(id, address);
         };
