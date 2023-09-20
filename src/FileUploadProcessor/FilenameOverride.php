@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 namespace iLub\Plugin\UnibeCalendarCustomGrid\FileUploadProcessor;
 
 use ILIAS\Filesystem\Stream\FileStream;
@@ -32,7 +34,7 @@ final class FilenameOverride implements PreProcessor {
     /**
 	 * @inheritDoc
 	 */
-	public function process(FileStream $stream, Metadata $metadata) {
+	public function process(FileStream $stream, Metadata $metadata): ProcessingStatus {
 		$metadata->setFilename(Util::normalizeRelativePath($this->filename));
 		return new ProcessingStatus(ProcessingStatus::OK, 'Filename changed');
 	}

@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace iLub\Plugin\UnibeCalendarCustomGrid\UI\Item;
 
 use ILIAS\UI\Component;
@@ -17,7 +17,7 @@ class Renderer extends DefaultRenderer {
 	/**
 	 * @inheritDoc
 	 */
-	public function render(Component\Component $component, RendererInterface $default_renderer) {
+	public function render(Component\Component $component, RendererInterface $default_renderer): string {
 		/**
 		 * @var $component DefaultUpload
 		 */
@@ -30,12 +30,13 @@ class Renderer extends DefaultRenderer {
 
 		$dropzone = $f->dropzone()
 		                ->file()
-		                ->wrapper($component->getUploadUrl(), $f->legacy($original_rendering))
+		                ->wrapper($component->getTitle(), $component->getUploadUrl(), $f->legacy($original_rendering))
 						->withTitle($this->txt("upload").": ".$component->getTitle()->getLabel());
-
+/*
 		$dropzone = $dropzone->withAdditionalOnLoadCode(function($id){
 			return "il.Unibe.customizeWrapper($id)";
 		});
+*/
 		$dropzone = $dropzone->withUserDefinedFileNamesEnabled(true);
 
 		return $default_renderer->render($dropzone);

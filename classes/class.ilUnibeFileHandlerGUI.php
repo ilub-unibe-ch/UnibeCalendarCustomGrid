@@ -1,9 +1,17 @@
 <?php
-use iLub\Plugin\UnibeCalendarCustomGrid\Ctrl\CtrlAware;
-use iLub\Plugin\UnibeCalendarCustomGrid\Ctrl\ICtrlAware;
-use iLub\Plugin\UnibeCalendarCustomGrid\FileUploadProcessor\FilenameOverride;
+declare(strict_types=1);
 
-require_once('./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/vendor/autoload.php');
+use ILIAS\FileUpload\Handler\AbstractCtrlAwareUploadHandler;
+use iLub\Plugin\UnibeCalendarCustomGrid\Ctrl\CtrlAware;
+use iLub\Plugin\UnibeCalendarCustomGrid\FileUploadProcessor\FilenameOverride;
+use ILIAS\FileUpload\DTO\UploadResult;
+use iLub\Plugin\UnibeCalendarCustomGrid\Ctrl\ICtrlAware;
+use ILIAS\FileUpload\Handler\HandlerResult;
+use ILIAS\FileUpload\Handler\BasicHandlerResult;
+use ILIAS\FileUpload\Handler\FileInfoResult;
+use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
+use ILIAS\FileUpload\Handler\BasicFileInfoResult;
+use ILIAS\DI\Container;
 
 /**
  * Class ilUnibeFileHandlerGUI
@@ -11,48 +19,50 @@ require_once('./Customizing/global/plugins/Services/Calendar/AppointmentCustomGr
  * @author Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  *
  * @ilCtrl_isCalledBy ilUnibeFileHandlerGUI: ilUIPluginRouterGUI
+ * @ilCtrl_isCalledBy ilUnibeFileHandlerGUI: ilDashboardGUI
+ * @ilCtrl_isCalledBy ilUnibeFileHandlerGUI: ilUnibeCalendarCustomModalPlugin
+ * @ilCtrl_IsCalledBy ilUnibeFileHandlerGUI: ilCalendarPresentationGUI
  */
-class ilUnibeFileHandlerGUI implements ICtrlAware {
+class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler {
 
 	const P_SESSION_OBJ_ID = 'session_id';
 	const P_FILE_REF_ID = 'file_id';
-	use CtrlAware;
-	/**
-	 * @var int
-	 */
-	protected $obj_id = 0;
-	/**
-	 * @var int
-	 */
-	protected $ref_id = 0;
+    protected const CMD_DOWNLOAD = 'download';
 
-	/**
-	 * @var int
-	 */
-	protected $file_id = 0;
+	protected int $obj_id = 0;
+	protected int $ref_id = 0;
+	protected int $file_id = 0;
 
+    protected Container $dic;
+
+
+    public function __construct()
+    {
+        global $DIC;
+        parent::__construct();
+        $this->dic = $DIC;
+    }
 
 	/**
 	 * @param $session_obj_id
 	 * @return string
 	 */
-	public function buildUploadURL($session_obj_id) {
-		$this->ctrl()->setParameter($this, self::P_SESSION_OBJ_ID, $session_obj_id);
+	public function buildUploadURL($session_obj_id): string {
+        $this->ctrl->setParameter($this, self::P_SESSION_OBJ_ID, $session_obj_id);
 
-		return $this->ctrl()->getLinkTargetByClass([
-			ilUIPluginRouterGUI::class,
-			self::class,
-		], self::CMD_UPLOAD, '', true);
+        return $this->ctrl->getLinkTargetByClass([
+            ilUIPluginRouterGUI::class,
+            self::class,
+        ], self::CMD_UPLOAD, '', true);
 	}
 
 	/**
 	 * @param $obj_id
 	 * @return string
 	 */
-	public function buildDownloadURL($obj_id) {
-		$this->ctrl()->setParameter($this, self::P_SESSION_OBJ_ID, $obj_id);
-
-		return $this->ctrl()->getLinkTargetByClass([
+	public function buildDownloadURL($obj_id): string{
+        $this->ctrl->setParameter($this, self::P_SESSION_OBJ_ID, $obj_id);
+		return $this->ctrl->getLinkTargetByClass([
 				ilUIPluginRouterGUI::class,
 				self::class,
 		], self::CMD_DOWNLOAD, '', true);
@@ -63,19 +73,19 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 	 * @param $file_id
 	 * @return string
 	 */
-	public function buildDeleteAction($obj_id,$file_id) {
-		$this->ctrl()->setParameter($this, self::P_SESSION_OBJ_ID, $obj_id);
-		$this->ctrl()->setParameter($this, self::P_FILE_REF_ID, $file_id);
+	public function buildDeleteAction($obj_id,$file_id): string {
+        $this->ctrl->setParameter($this, self::P_SESSION_OBJ_ID, $obj_id);
+        $this->ctrl->setParameter($this, self::P_FILE_REF_ID, $file_id);
 
-		$async_url = $this->ctrl()->getLinkTargetByClass([
+		$async_url = $this->ctrl->getLinkTargetByClass([
 				ilUIPluginRouterGUI::class,
 				self::class,
-		], self::CMD_DELETE, '', true);
+		], "delete", '', true);
 		$action = "il.Unibe.deleteFile(this,'$async_url');";
 		return $action;
 	}
 
-	public function delete()
+	public function delete(): void
 	{
 		global $DIC;
 
@@ -98,7 +108,7 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 	 * @param $obj_id
 	 * @return bool
 	 */
-	public function hasFiles($obj_id){
+	public function hasFiles($obj_id): bool{
 		$event_items = (ilObjectActivation::getItemsByEvent($obj_id));
 
 		if (count($event_items)) {
@@ -108,9 +118,10 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 				}
 			}
 		}
+        return false;
 	}
 
-	public function download()
+	public function download(): void
 	{
 		global $DIC;
 		$this->initIDsFromRequest();
@@ -129,7 +140,7 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 			foreach ($event_items as $item) {
 				if ($item['type'] == "file") {
 					$files_count++;
-					$file = new ilObjFile($item['ref_id']);
+					$file = new ilObjFile((int)$item['ref_id']);
 					$file_name =  $file->getFileName();
 					$file_path = $file->getDirectory($file->getVersion())."/data";
 					$rel_file_path = str_replace(CLIENT_DATA_DIR,"",$file_path);
@@ -138,8 +149,6 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 					if(!$temp->has($full_temp_path)){
 						$temp->writeStream($full_temp_path, $stream);
 					}
-
-
 				}
 			}
 
@@ -150,21 +159,17 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 				$download_name = $session->getTitle().".zip";
 				$tmp_zip_folder = CLIENT_DATA_DIR."/".$temp_folder_name;
 				$tmp_zip_file = $tmp_zip_folder.".zip";
-				ilUtil::zip($tmp_zip_folder,$tmp_zip_file);
+				ilFileUtils::zip($tmp_zip_folder,$tmp_zip_file);
 				$temp->deleteDir($temp_folder_name);
 				ilFileDelivery::deliverFileAttached($tmp_zip_file,$download_name,'',true);
-
 			}
-
-
-
 		}
 	}
 
 
 
 
-	public function upload() {
+	public function upload(): void {
 		global $DIC;
 		$this->initIDsFromRequest();
 
@@ -196,7 +201,7 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 	 * @param string $filename
 	 * @return mixed|null|string|string[]
 	 */
-	public function customConvertToASCII(string $filename){
+	public function customConvertToASCII(string $filename): mixed{
 		$umlautsI = array("Ä"=>"Ae", "Ö"=>"Oe", "Ü"=>"Ue",
 			"ä"=>"ae", "ö"=>"oe", "ü"=>"ue", "ß"=>"ss");
 		foreach($umlautsI as $src => $tgt)
@@ -218,13 +223,10 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 	}
 
     /**
-     * @param string $tempname
-     * @param \ILIAS\FileUpload\DTO\UploadResult $result
-     * @return string
      * @throws \ILIAS\FileUpload\Collection\Exception\NoSuchElementException
      * @throws \ILIAS\FileUpload\Exception\IllegalStateException
      */
-	private function handleFileUpload(string $tempname, \ILIAS\FileUpload\DTO\UploadResult $result) {
+	private function handleFileUpload(string $tempname, UploadResult $result): string {
 		global $DIC;
 
 		$file = new \ilObjFile();
@@ -232,13 +234,10 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 		$file->setTitle($result->getName());
 		$file->setFileName($result->getName());
 		$file->setDescription('');
-		$file->setFileType($result->getMimeType());
-		$file->setFileSize($result->getSize());
 		$file->create();
 		$new_ref_id = $file->createReference();
-		$file->putInTree($this->tree()->getParentId($this->getRefId()));
-		$file->setPermissions($this->tree()->getParentId($this->getRefId()));
-		$file->createDirectory();
+		$file->putInTree($this->dic->tree()->getParentId($this->getRefId()));
+		$file->setPermissions($this->dic->tree()->getParentId($this->getRefId()));
 		$file->getUploadFile($tempname, $result->getName());
 
 		/*
@@ -270,7 +269,7 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 	/**
 	 * @param int $obj_id
 	 */
-	public function setObjId(int $obj_id) {
+	public function setObjId(int $obj_id): void {
 		$this->obj_id = $obj_id;
 	}
 
@@ -286,17 +285,19 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 	/**
 	 * @param int $ref_id
 	 */
-	public function setRefId(int $ref_id) {
+	public function setRefId(int $ref_id): void {
 		$this->ref_id = $ref_id;
 	}
 
 
-	private function initIDsFromRequest() {
-		$this->setObjId($this->http()->request()->getQueryParams()[self::P_SESSION_OBJ_ID]);
-		$this->setFileId($this->http()->request()->getQueryParams()[self::P_FILE_REF_ID]);
+	private function initIDsFromRequest(): void {
+		$this->setObjId((int)$this->dic->http()->request()->getQueryParams()[self::P_SESSION_OBJ_ID]);
+        if($this->dic->http()->wrapper()->query()->has(self::P_FILE_REF_ID)){
+            $this->setFileId($this->dic->http()->request()->getQueryParams()[self::P_FILE_REF_ID]);
+        }
 		$ref_ids = array();
 		foreach (ilObject::_getAllReferences($this->getObjId()) as $ref_id) {
-			if ($this->access()->checkAccess("read", "", $ref_id)) {
+			if ($this->dic->access()->checkAccess("read", "", $ref_id)) {
 				$ref_ids[] = $ref_id;
 			}
 		}
@@ -307,7 +308,7 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 	/**
 	 * @return int
 	 */
-	public function getFileId()
+	public function getFileId(): int
 	{
 		return $this->file_id;
 	}
@@ -315,8 +316,77 @@ class ilUnibeFileHandlerGUI implements ICtrlAware {
 	/**
 	 * @param int $file_id
 	 */
-	public function setFileId($file_id)
+	public function setFileId(int $file_id): void
 	{
 		$this->file_id = $file_id;
 	}
+
+    public function getInfoForExistingFiles(array $file_ids) : array
+    {
+        $info_results = [];
+        foreach ($file_ids as $identifier) {
+            $info_results[] = $this->getInfoResult($identifier);
+        }
+
+        return $info_results;
+    }
+
+    public function getInfoResult(string $identifier) : ?FileInfoResult
+    {
+        if (null !== ($id = $this->dic->storage->manage()->find($identifier))) {
+            $revision = $this->dic->storage->manage()->getCurrentRevision($id)->getInformation();
+            $title = $revision->getTitle();
+            $size = $revision->getSize();
+            $mime = $revision->getMimeType();
+        } else {
+            $title = $mime = 'unknown';
+            $size = 0;
+        }
+
+        return new BasicFileInfoResult($this->getFileIdentifierParameterName(), $identifier, $title, $size, $mime);
+    }
+
+
+    protected function getUploadResult() : HandlerResult
+    {
+        $this->upload->process();
+        $result_array = $this->upload->getResults();
+        $result = end($result_array);
+
+        if ($result instanceof UploadResult && $result->isOK()) {
+            $status = HandlerResult::STATUS_OK;
+
+            return new BasicHandlerResult(
+                $this->getFileIdentifierParameterName(),
+                HandlerResult::STATUS_OK,
+                "",
+                "file upload OK"
+            );
+        } else {
+            return new BasicHandlerResult(
+                '',
+                HandlerResult::STATUS_FAILED,
+                "",
+                $result->getStatus()->getMessage()
+            );
+        }
+    }
+
+    protected function getRemoveResult(string $identifier) : HandlerResult
+    {
+        if (null !== ($id = $this->dic->storage->manage()->find($identifier))) {
+            $status = HandlerResult::STATUS_OK;
+            $message = "file removal OK";
+        } else {
+            $status = HandlerResult::STATUS_OK;
+            $message = "file with identifier '$identifier' doesn't exist, nothing to do.";
+        }
+
+        return new BasicHandlerResult(
+            $this->getFileIdentifierParameterName(),
+            $status,
+            $identifier,
+            $message
+        );
+    }
 }

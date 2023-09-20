@@ -1,8 +1,8 @@
 <?php
-
+declare(strict_types=1);
 use iLub\Plugin\UnibeCalendarCustomGrid\UI\Item\Upload;
-
-require_once('./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/vendor/autoload.php');
+use ILIAS\UI\Component\Item\Item;
+use ILIAS\DI\Container;
 
 /**
  * Class ilUnibeCalendarCustomGridPlugin
@@ -14,65 +14,63 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
     /**
      * ilCalendarCategory []
      */
-    protected $categories = [];
+    protected array $categories = [];
+    protected Container $dic;
 
-	/**
-	 * @return    string    Plugin Name
-	 */
-	public final function getPluginName() {
+    public function __construct(ilDBInterface $db, ilComponentRepositoryWrite $component_repository, string $id)
+    {
+        parent::__construct($db, $component_repository, $id);
+        if(empty($this->dic)){
+            global $DIC;
+            $this->dic = $DIC;
+        }
+    }
+
+    public final function getPluginName(): string {
 		return "UnibeCalendarCustomGrid";
 	}
 
 
 	/**
 	 * Replace the whole appointment presentation in the grid.
-	 *
-	 * @param string $a_content html grid content
-	 *
-	 * @return mixed string or empty.
 	 */
-	public function replaceContent($a_content) {
-		/**
-		 * @var $DIC \ILIAS\DI\Container
-		 */
-		global $DIC;
-
-		$renderer = $DIC->ui()->renderer();
-		$factory = $DIC->ui()->factory();
+    public function replaceContent(string $content): string
+    {
+		$renderer = $this->dic->ui()->renderer();
+		$factory = $this->dic->ui()->factory();
         $this->initJSAndCSS();
 
 		if ($this->isSession() && $this->checkWriteAccess()) {
 
 			$wrapper = $factory->dropzone()->file()->wrapper(
+                $this->txt("upload_to")." ".$this->getCategory()->getTitle(),
 					$this->getUploadURL(),
-					$factory->legacy($a_content))->withTitle($this->txt("upload_to")." ".$this->getCategory()->getTitle());
-			$wrapper = $wrapper->withAdditionalOnLoadCode(function($id){
+					$factory->legacy($content),
+                    $factory->input()->field()->file(new ilObjFileUploadHandlerGUI(), ""));
+		/*	$wrapper = $wrapper->withAdditionalOnLoadCode(function($id){
 				return "il.Unibe.customizeWrapper($id)";
-			});
-
-			$wrapper= $wrapper->withUserDefinedFileNamesEnabled(true);
+			});*/
 
 			return "<span>".$renderer->render($wrapper)."</span>";
 		}
 
-		return $a_content;
+		return $content;
 	}
 
 	/**
 	 * @return bool
 	 */
-	public function checkWriteAccess(){
-		global $DIC;
-
-		$ref_id = array_pop(ilObject::_getAllReferences($this->getCategory()->getObjId()));
-		return $DIC->rbac()->system()->checkAccess("manage_materials",$ref_id,"sess");
+	public function checkWriteAccess(): bool{
+        $ref_array = ilObject::_getAllReferences($this->getCategory()->getObjId());
+        $ref_id = array_pop( $ref_array);
+		return $this->dic->rbac()->system()->checkAccess("manage_materials",$ref_id,"sess");
 	}
 
 
 	/**
 	 * @return bool
 	 */
-	private function isSession() {
+	private function isSession(): bool{
 		return $this->getCategory()->getObjType() === "sess";
 	}
 
@@ -80,7 +78,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	/**
 	 * @return string or empty.
 	 */
-	public function addExtraContent() {
+	public function addExtraContent(): string {
 
 		$content = "";
 		//$content .= $this->getFilesHtml();
@@ -90,7 +88,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 
 	}
 
-	protected function getMetaDozentenDataHtml(){
+	protected function getMetaDozentenDataHtml(): string{
 
 		$meta_html = "";
 
@@ -117,26 +115,21 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 		return $meta_html;
 	}
 
-	/**
-	 * @param string $title
-	 * @return ilPDOStatement
-	 */
-	protected function getMetaDataValueByTitle(string $title){
-		global $DIC;
+	protected function getMetaDataValueByTitle(string $title): ilPDOStatement{
 
 		$obj_id = $this->getCategory()->getObjId();
 		$query = "SELECT val.value
 			FROM adv_md_values_ltext as val
 			INNER JOIN adv_mdf_definition as def ON  val.field_id = def.field_id
 			WHERE def.title = '$title' AND val.obj_id = $obj_id";
-		return $DIC->database()->query($query);
+		return $this->dic->database()->query($query);
 	}
 
-	protected function getFilesHtml(){
+	protected function getFilesHtml(): string{
 		$obj_id = $this->getCategory()->getObjId();
 
 
-		$file_handler = new ilUnibeFileHandlerGUI();
+		$file_handler = new ilUnibeFileHandlerGUI(new ilObjFileStakeholder($this->dic->user()->getId()));
 		if($file_handler->hasFiles($obj_id)){
             //return  "<span class='il-downloader'><div class=\"glyphicon glyphicon-download-alt\" aria-hidden=\"true\"></div></span>";
 
@@ -149,38 +142,26 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	}
 
 
-	/**
-	 * @return string
-	 */
-	public function addGlyph() {
-		return false;
+	public function addGlyph(): string{
+		return "";
 	}
 
 
-	/**
-	 * @param \ILIAS\UI\Component\Item\Item $a_item
-	 *
-	 * @return \ILIAS\UI\Component\Item\Item
-	 */
-	public function editAgendaItem(\ILIAS\UI\Component\Item\Item $a_item) {
+	public function editAgendaItem(Item $item): Item {
         $this->initJSAndCSS();
 
         if($this->isSession() &&  $this->checkWriteAccess()){
-			$upload_item = (new Upload($a_item->getTitle()))->withUploadURL($this->getUploadURL());
-			return $upload_item->copyFromItem($a_item);
+			$upload_item = (new Upload($item->getTitle()))->withUploadURL($this->getUploadURL());
+			return $upload_item->copyFromItem($item);
 		}
-
-
-		return $a_item;
+		return $item;
 	}
 
 
 	/**
-	 * @return bool|string
 	 * @throws ilDatabaseException
 	 */
-	public function editShyButtonTitle() {
-	    global $DIC;
+	public function editShyButtonTitle(): string {
 	    $files_glyph = $this->getFilesHtml();
 		$short_title = $this->getMetaDataValueByTitle("Kurzbezeichnung")->fetchRow();
 		if(!$short_title){
@@ -189,21 +170,19 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 
 		$start_time = $this->getAppointment()->getStart()->get(IL_CAL_FKT_DATE,"G:i");
 		$end_time = $this->getAppointment()->getEnd()->get(IL_CAL_FKT_DATE,"G:i");
-		if($DIC->ctrl()->getCmdClass()!="ilcalendardaygui"){
+		if($this->dic->ctrl()->getCmdClass()!="ilcalendardaygui"){
             return $start_time."-".$end_time.": ". $short_title['value'].$files_glyph;
         }else{
-            return $start_time."-".$end_time.": ". $this->getAppointment()->getTitle().", ".$short_title['value'].$files_glyph;;
+            return $start_time."-".$end_time.": ". $this->getAppointment()->getTitle().", ".$short_title['value'].$files_glyph;
         }
 
 	}
 
 
-	private function initJSAndCSS() {
+	private function initJSAndCSS(): void{
 		static $init;
 		if (!$init) {
-			global $DIC;
-
-			$tpl = $DIC->ui()->mainTemplate();
+			$tpl = $this->dic->ui()->mainTemplate();
             $tpl->addJavaScript("./libs/bower/bower_components/jquery-dragster/jquery.dragster.js");
             $tpl->addJavaScript("./libs/bower/bower_components/fine-uploader/dist/fine-uploader.core.min.js");
             $tpl->addJavaScript("./src/UI/templates/js/Dropzone/File/uploader.js");
@@ -220,10 +199,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	}
 
 
-	/**
-	 * @return \ilCalendarCategory
-	 */
-	private function getCategory(): \ilCalendarCategory {
+	private function getCategory(): ilCalendarCategory {
 		$entry_id = $this->getAppointment()->getEntryId();
 		if(! array_key_exists($entry_id, $this->categories)){
 			$cat_id = ilCalendarCategoryAssignments::_lookupCategory($entry_id);
@@ -233,10 +209,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin {
 	}
 
 
-	/**
-	 * @return string
-	 */
 	private function getUploadURL(): string {
-		return (new ilUnibeFileHandlerGUI())->buildUploadURL($this->getCategory()->getObjId());
+		return (new ilUnibeFileHandlerGUI(new ilObjFileStakeholder($this->dic->user()->getId())))->buildUploadURL($this->getCategory()->getObjId());
 	}
 }

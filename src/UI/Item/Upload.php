@@ -1,10 +1,10 @@
 <?php
-
+declare(strict_types=1);
 namespace iLub\Plugin\UnibeCalendarCustomGrid\UI\Item;
 
 use ILIAS\UI\Implementation\Component\Item\Standard;
 use ILIAS\UI\Component\Item\Standard as StandardItem;
-
+use ILIAS\UI\Implementation\Component\Item\Item;
 
 /**
  * Class Upload
@@ -13,16 +13,11 @@ use ILIAS\UI\Component\Item\Standard as StandardItem;
  */
 class Upload extends  Standard implements StandardItem {
 
-	/**
-	 * @var string
-	 */
-	protected $upload_url = '';
 
-	/**
-	 * @param StandardItem $item
-	 * @return Upload
-	 */
-	public function copyFromItem(StandardItem $item){
+	protected string $upload_url = '';
+
+
+	public function copyFromItem(Item $item): Upload{
 		$clone = clone $this;
 
 		if (is_array($item->getProperties())) {
@@ -44,7 +39,7 @@ class Upload extends  Standard implements StandardItem {
 		return $clone;
 	}
 
-	public function copyToItem(StandardItem $item){
+	public function copyToItem(StandardItem $item): StandardItem{
 		if (is_array($this->getProperties())) {
 			$item = $item->withProperties($this->getProperties());
 		}
@@ -69,7 +64,7 @@ class Upload extends  Standard implements StandardItem {
 	 *
 	 * @return Upload
 	 */
-	public function withUploadURL($url) {
+	public function withUploadURL($url): Upload {
 		$clone = clone $this;
 		$clone->upload_url = $url;
 
@@ -80,7 +75,7 @@ class Upload extends  Standard implements StandardItem {
 	/**
 	 * @return string
 	 */
-	public function getUploadUrl() {
+	public function getUploadUrl(): string {
 		return $this->upload_url;
 	}
 
