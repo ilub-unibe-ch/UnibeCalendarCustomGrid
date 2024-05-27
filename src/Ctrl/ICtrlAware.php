@@ -10,91 +10,91 @@ namespace iLub\Plugin\UnibeCalendarCustomGrid\Ctrl;
  *
  * @author Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  */
-interface ICtrlAware {
+interface ICtrlAware
+{
+    public const CMD_UPLOAD = "upload";
+    public const CMD_DOWNLOAD = "download";
+    public const CMD_DELETE = "delete";
 
-	const CMD_UPLOAD = "upload";
-	const CMD_DOWNLOAD = "download";
-	const CMD_DELETE = "delete";
-
-	public function executeCommand();
-
-
-	/**
-	 * @return ICtrlAware
-	 */
-	public function getParentController();
+    public function executeCommand();
 
 
-	/**
-	 * @param ICtrlAware $ctrlAware
-	 */
-	public function setParentController(ICtrlAware $ctrlAware);
+    /**
+     * @return ICtrlAware
+     */
+    public function getParentController();
 
 
-	public function upload();
+    /**
+     * @param ICtrlAware $ctrlAware
+     */
+    public function setParentController(ICtrlAware $ctrlAware);
 
 
-	public function download();
+    public function upload();
 
 
-	/**
-	 * @return array of ClassNames this Controller can call using ILIAS ilCtrl
-	 */
-	public function getPossibleNextClasses();
+    public function download();
 
 
-	/**
-	 * @return \ilCtrl
-	 */
-	public function ctrl();
+    /**
+     * @return array of ClassNames this Controller can call using ILIAS ilCtrl
+     */
+    public function getPossibleNextClasses();
 
 
-	/**
-	 * @return \ilTemplate the global Instance
-	 */
-	public function tpl();
+    /**
+     * @return \ilCtrl
+     */
+    public function ctrl();
 
 
-	/**
-	 * @return \ilLanguage
-	 */
-	public function language();
+    /**
+     * @return \ilTemplate the global Instance
+     */
+    public function tpl();
 
 
-	/**
-	 * @return \ilTabsGUI
-	 */
-	public function tabs();
+    /**
+     * @return \ilLanguage
+     */
+    public function language();
 
 
-	/**
-	 * @return \ilObjUser
-	 */
-	public function user();
+    /**
+     * @return \ilTabsGUI
+     */
+    public function tabs();
 
 
-	/**
-	 * @return \ilAccessHandler
-	 */
-	public function access();
+    /**
+     * @return \ilObjUser
+     */
+    public function user();
 
 
-	/**
-	 * @return \ILIAS\DI\HTTPServices
-	 */
-	public function http();
+    /**
+     * @return \ilAccessHandler
+     */
+    public function access();
 
 
-	/**
-	 * @return \ilTree
-	 */
-	public function tree();
+    /**
+     * @return \ILIAS\DI\HTTPServices
+     */
+    public function http();
 
 
-	/**
-	 * @param \SRAG\Learnplaces\gui\helper\ICtrlAware $ctrlAware the current controller
-	 *
-	 * @return bool whether a next class has handled the request or not
-	 */
-	public function handleNextClass(ICtrlAware $ctrlAware);
+    /**
+     * @return \ilTree
+     */
+    public function tree();
+
+
+    /**
+     * @param \SRAG\Learnplaces\gui\helper\ICtrlAware $ctrlAware the current controller
+     *
+     * @return bool whether a next class has handled the request or not
+     */
+    public function handleNextClass(ICtrlAware $ctrlAware);
 }

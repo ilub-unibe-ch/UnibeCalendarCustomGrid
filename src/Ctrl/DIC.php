@@ -7,135 +7,147 @@ namespace iLub\Plugin\UnibeCalendarCustomGrid\Ctrl;
  *
  * @author Fabian Schmid <fs@studer-raimann.ch>
  */
-trait DIC  {
-
-	/**
-	 * @var \ilAccessHandler
-	 */
-	private $access;
-	/**
-	 * @var \ilObjUser
-	 */
-	private $user;
-	/**
-	 * @var \ilCtrl
-	 */
-	private $ctrl;
-	/**
-	 * @var \ilTemplate
-	 */
-	private $tpl;
-	/**
-	 * @var \ilLanguage
-	 */
-	private $language;
-	/**
-	 * @var \ilTabsGUI
-	 */
-	private $tabs;
-
-
-	/**
-	 * @return \ILIAS\DI\Container
-	 */
-	private function dic() {
-		return $GLOBALS['DIC'];
-	}
+trait DIC
+{
+    /**
+     * @var \ilAccessHandler
+     */
+    private $access;
+    /**
+     * @var \ilObjUser
+     */
+    private $user;
+    /**
+     * @var \ilCtrl
+     */
+    private $ctrl;
+    /**
+     * @var \ilTemplate
+     */
+    private $tpl;
+    /**
+     * @var \ilLanguage
+     */
+    private $language;
+    /**
+     * @var \ilTabsGUI
+     */
+    private $tabs;
 
 
-	/**
-	 * @return \ilCtrl
-	 */
-	public function ctrl() {
-		return $this->dic()->ctrl();
-	}
+    /**
+     * @return \ILIAS\DI\Container
+     */
+    private function dic()
+    {
+        return $GLOBALS['DIC'];
+    }
 
 
-	/**
-	 * @param $variable
-	 *
-	 * @return string
-	 */
-	public function txt($variable) {
-		return $this->dic()->language()->txt($variable);
-	}
+    /**
+     * @return \ilCtrl
+     */
+    public function ctrl()
+    {
+        return $this->dic()->ctrl();
+    }
 
 
-	/**
-	 * @return \ilTemplate
-	 */
-	public function tpl() {
-		return $this->dic()->ui()->mainTemplate();
-	}
+    /**
+     * @param $variable
+     *
+     * @return string
+     */
+    public function txt($variable)
+    {
+        return $this->dic()->language()->txt($variable);
+    }
 
 
-	/**
-	 * @return \ilLanguage
-	 */
-	public function language() {
-		return $this->dic()->language();
-	}
+    /**
+     * @return \ilTemplate
+     */
+    public function tpl()
+    {
+        return $this->dic()->ui()->mainTemplate();
+    }
 
 
-	/**
-	 * @return \ilTabsGUI
-	 */
-	public function tabs() {
-		return $this->dic()->tabs();
-	}
+    /**
+     * @return \ilLanguage
+     */
+    public function language()
+    {
+        return $this->dic()->language();
+    }
 
 
-	/**
-	 * @return \ILIAS\DI\UIServices
-	 */
-	public function ui() {
-		return $this->dic()->ui();
-	}
+    /**
+     * @return \ilTabsGUI
+     */
+    public function tabs()
+    {
+        return $this->dic()->tabs();
+    }
 
 
-	/**
-	 * @return \ilObjUser
-	 */
-	public function user() {
-		return $this->dic()->user();
-	}
+    /**
+     * @return \ILIAS\DI\UIServices
+     */
+    public function ui()
+    {
+        return $this->dic()->ui();
+    }
 
 
-	/**
-	 * @return \ilAccessHandler
-	 */
-	public function access() {
-		return $this->dic()->access();
-	}
+    /**
+     * @return \ilObjUser
+     */
+    public function user()
+    {
+        return $this->dic()->user();
+    }
 
 
-	/**
-	 * @return \ILIAS\DI\HTTPServices
-	 */
-	public function http() {
-		return $this->dic()->http();
-	}
+    /**
+     * @return \ilAccessHandler
+     */
+    public function access()
+    {
+        return $this->dic()->access();
+    }
 
 
-	/**
-	 * @return \ilTree
-	 */
-	public function tree() {
-		return $this->dic()->repositoryTree();
-	}
+    /**
+     * @return \ILIAS\DI\HTTPServices
+     */
+    public function http()
+    {
+        return $this->dic()->http();
+    }
 
 
-	/**
-	 * @return int
-	 */
-	protected function getCurrentRefId() {
-		try {
-			$http = $this->dic()->http();
-			$ref_id = (int)$http->request()->getQueryParams()["ref_id"];
-		} catch (\Exception $e) {
-			$ref_id = (int)$_GET["ref_id"];
-		}
+    /**
+     * @return \ilTree
+     */
+    public function tree()
+    {
+        return $this->dic()->repositoryTree();
+    }
 
-		return $ref_id;
-	}
+
+    /**
+     * @return int
+     */
+    protected function getCurrentRefId()
+    {
+        try {
+            $http = $this->dic()->http();
+            $ref_id = (int)$http->request()->getQueryParams()["ref_id"];
+        } catch (\Exception $e) {
+            $ref_id = (int)$_GET["ref_id"];
+        }
+
+        return $ref_id;
+    }
 }

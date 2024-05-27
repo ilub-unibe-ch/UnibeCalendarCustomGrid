@@ -10,119 +10,130 @@ namespace iLub\Plugin\UnibeCalendarCustomGrid\Ctrl;
  *
  * @author Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  */
-trait CtrlAware {
-
-	use CtrlHandler;
-	use DIC;
-	/**
-	 * @var ICtrlAware
-	 */
-	protected $parent_gui = null;
-
-
-	public function executeCommand() {
-		if ($this->handleNextClass($this)) {
-			return true;
-		}
-
-		$cmd = $this->ctrl()->getCmd();
-		if ($this->getActiveTabId()) {
-			$this->tabs()->activateTab($this->getActiveTabId());
-		}
-
-		switch ($cmd) {
-			default:
-				//@Todo: Important add permission checks here for various actions.
-				if ($this->checkRequestReferenceId()) {
-					$this->{$cmd}();
-				}
-				break;
-		}
-		$this->tpl()->show();
-
-		return true;
-	}
+trait CtrlAware
+{
+    use CtrlHandler;
+    use DIC;
+    /**
+     * @var ICtrlAware
+     */
+    protected $parent_gui = null;
 
 
-	/**
-	 * @return ICtrlAware
-	 */
-	public function getParentController() {
-		return $this->parent_gui;
-	}
+    public function executeCommand()
+    {
+        if ($this->handleNextClass($this)) {
+            return true;
+        }
+
+        $cmd = $this->ctrl()->getCmd();
+        if ($this->getActiveTabId()) {
+            $this->tabs()->activateTab($this->getActiveTabId());
+        }
+
+        switch ($cmd) {
+            default:
+                //@Todo: Important add permission checks here for various actions.
+                if ($this->checkRequestReferenceId()) {
+                    $this->{$cmd}();
+                }
+                break;
+        }
+        $this->tpl()->show();
+
+        return true;
+    }
 
 
-	/**
-	 * @param ICtrlAware $ctrlAware
-	 */
-	public function setParentController(ICtrlAware $ctrlAware) {
-		$this->parent_gui = $ctrlAware;
-	}
+    /**
+     * @return ICtrlAware
+     */
+    public function getParentController()
+    {
+        return $this->parent_gui;
+    }
 
 
-	/**
-	 * @return array of GUI_Class-Names which use CtrlAware
-	 */
-	public function getPossibleNextClasses() {
-		return [];
-	}
+    /**
+     * @param ICtrlAware $ctrlAware
+     */
+    public function setParentController(ICtrlAware $ctrlAware)
+    {
+        $this->parent_gui = $ctrlAware;
+    }
 
 
-	/**
-	 * @return null|string of active Tab
-	 */
-	protected function getActiveTabId() {
-		return null;
-	}
+    /**
+     * @return array of GUI_Class-Names which use CtrlAware
+     */
+    public function getPossibleNextClasses()
+    {
+        return [];
+    }
 
 
-	public function cancel() {
-		$this->ctrl()->redirect($this, ICtrlAware::CMD_INDEX);
-	}
+    /**
+     * @return null|string of active Tab
+     */
+    protected function getActiveTabId()
+    {
+        return null;
+    }
 
 
-	/***
-	 * @param $html
-	 */
-	protected function setContent($html) {
-		$this->tpl()->setContent($html);
-	}
+    public function cancel()
+    {
+        $this->ctrl()->redirect($this, ICtrlAware::CMD_INDEX);
+    }
 
 
-	/***
-	 * @param $title
-	 */
-	protected function setTitle($title) {
-		$this->tpl()->setTitle($title);
-	}
+    /***
+     * @param $html
+     */
+    protected function setContent($html)
+    {
+        $this->tpl()->setContent($html);
+    }
 
 
-	/**
-	 * @param $subtab_id
-	 * @param $url
-	 */
-	protected function pushSubTab($subtab_id, $url) {
-		$this->tabs()->addSubTab($subtab_id, $this->lang()->txt($subtab_id), $url);
-	}
+    /***
+     * @param $title
+     */
+    protected function setTitle($title)
+    {
+        $this->tpl()->setTitle($title);
+    }
 
 
-	/**
-	 * @param $subtab_id
-	 */
-	protected function activeSubTab($subtab_id) {
-		$this->tabs()->activateSubTab($subtab_id);
-	}
+    /**
+     * @param $subtab_id
+     * @param $url
+     */
+    protected function pushSubTab($subtab_id, $url)
+    {
+        $this->tabs()->addSubTab($subtab_id, $this->lang()->txt($subtab_id), $url);
+    }
 
 
-	protected function checkRequestReferenceId() {
-		/**
-		 * @var $ilAccess \ilAccessHandler
-		 */
-		$ref_id = $this->getCurrentRefId();
-		if ($ref_id) {
-			return $this->dic()->access()->checkAccess("read", "", $ref_id);
-		}
+    /**
+     * @param $subtab_id
+     */
+    protected function activeSubTab($subtab_id)
+    {
+        $this->tabs()->activateSubTab($subtab_id);
+    }
 
-		return true;
-	}
+
+    protected function checkRequestReferenceId()
+    {
+        /**
+         * @var $ilAccess \ilAccessHandler
+         */
+        $ref_id = $this->getCurrentRefId();
+        if ($ref_id) {
+            return $this->dic()->access()->checkAccess("read", "", $ref_id);
+        }
+
+        return true;
+    }
 }
