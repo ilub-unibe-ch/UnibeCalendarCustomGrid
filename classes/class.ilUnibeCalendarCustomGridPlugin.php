@@ -121,7 +121,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin
         return $meta_html;
     }
 
-    protected function getMetaDataValueByTitle(string $title): ilPDOStatement
+    protected function getMetaDataValueByTitle(string $title, ?string $lng = null): ilPDOStatement
     {
 
         $obj_id = $this->getCategory()->getObjId();
@@ -129,6 +129,11 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin
 			FROM adv_md_values_ltext as val
 			INNER JOIN adv_mdf_definition as def ON  val.field_id = def.field_id
 			WHERE def.title = '$title' AND val.obj_id = $obj_id";
+
+        if($lng) {
+            $query .= " AND val.value_index = '$lng'";
+        }
+
         return $this->dic->database()->query($query);
     }
 
@@ -172,14 +177,16 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin
     public function editShyButtonTitle(): string
     {
         $files_glyph = $this->getFilesHtml();
-        $short_title = $this->getMetaDataValueByTitle("Kurzbezeichnung")->fetchRow();
+        $short_title = $this->getMetaDataValueByTitle("Kurzbezeichnung", "de")->fetchAssoc();
         if(!$short_title) {
             return $this->getAppointment()->getTitle().$files_glyph;
         }
 
         $start_time = $this->getAppointment()->getStart()->get(IL_CAL_FKT_DATE, "G:i");
         $end_time = $this->getAppointment()->getEnd()->get(IL_CAL_FKT_DATE, "G:i");
+
         if($this->dic->ctrl()->getCmdClass() != "ilcalendardaygui") {
+
             return $start_time."-".$end_time.": ". $short_title['value'].$files_glyph;
         } else {
             return $start_time."-".$end_time.": ". $this->getAppointment()->getTitle().", ".$short_title['value'].$files_glyph;
