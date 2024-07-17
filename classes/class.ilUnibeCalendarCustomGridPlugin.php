@@ -200,6 +200,9 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin
         static $init;
         if (!$init) {
             $tpl = $this->dic->ui()->mainTemplate();
+            $tpl->addCss("node_modules/ol/ol.css");
+            $tpl->addCss("Services/Maps/css/service_openlayers.css");
+            $tpl->addJavaScript("Services/Maps/js/dist/ServiceOpenLayers.js");
             $tpl->addCss("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/css/custom.css");
             $tpl->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/deleteFile.js");
             $init = true;
