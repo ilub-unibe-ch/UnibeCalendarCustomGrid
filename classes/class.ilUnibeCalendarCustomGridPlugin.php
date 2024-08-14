@@ -109,7 +109,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin
                 $words = explode(" ", $name_only);
                 $acronym = "";
                 foreach ($words as $w) {
-                    if(is_array($w) && count($w) < 1) {
+                    if(is_array($w)) {
                         $acronym .= $w[0];
                     }
                 }
