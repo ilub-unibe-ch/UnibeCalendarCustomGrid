@@ -21,13 +21,10 @@ use ILIAS\FileUpload\Processor\PreProcessor;
  */
 final class FilenameOverride implements PreProcessor
 {
-    /**
-     * @var string
-     */
-    protected $filename;
+
+    protected string $filename;
     /**
      * FilenameOverride constructor.
-     * @param string $filename
      */
     public function __construct(string $filename)
     {

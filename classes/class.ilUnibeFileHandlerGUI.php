@@ -10,6 +10,7 @@ use ILIAS\FileUpload\Handler\BasicHandlerResult;
 use ILIAS\FileUpload\Handler\FileInfoResult;
 use ILIAS\FileUpload\Handler\BasicFileInfoResult;
 use ILIAS\DI\Container;
+use ILIAS\Filesystem\Stream\Streams;
 
 /**
  * Class ilUnibeFileHandlerGUI
@@ -58,8 +59,7 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
     }
 
     /**
-     * @param $session_obj_id
-     * @return string
+     * @throws ilCtrlException
      */
     public function getUploadURL(): string
     {
@@ -71,6 +71,9 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
         ], self::CMD_UPLOAD, null, true);
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function getExistingFileInfoURL(): string
     {
         return $this->ctrl->getLinkTargetByClass(
@@ -81,6 +84,9 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
         );
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function getFileRemovalURL(): string
     {
         return $this->ctrl->getLinkTargetByClass(
@@ -90,9 +96,9 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
             true
         );
     }
+
     /**
-     * @param $obj_id
-     * @return string
+     * @throws ilCtrlException
      */
     public function getDownloadURL($obj_id): string
     {
@@ -104,11 +110,9 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
     }
 
     /**
-     * @param $obj_id
-     * @param $file_id
-     * @return string
+     * @throws ilCtrlException
      */
-    public function getDeleteAction($obj_id, $file_id): string
+    public function getDeleteAction(int $obj_id, int $file_id): string
     {
         $this->ctrl->setParameter($this, self::P_SESSION_OBJ_ID, $obj_id);
         $this->ctrl->setParameter($this, self::P_FILE_REF_ID, $file_id);
@@ -116,7 +120,7 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
         $async_url = $this->ctrl->getLinkTargetByClass([
                 ilUIPluginRouterGUI::class,
                 self::class,
-        ], "delete", '', true);
+        ], 'delete', '', true);
         return "il.Unibe.deleteFile(this,'$async_url');";
     }
 
@@ -128,15 +132,15 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
 
 
         $file = new ilObjFile($this->getFileId());
-        $query = "DELETE FROM event_items ".
-                "WHERE event_id = ".$DIC->database()->quote($this->getObjId(), 'integer').
-                " AND item_id = ".$DIC->database()->quote($this->getFileId(), 'integer')." ";
+        $query = 'DELETE FROM event_items ' .
+            'WHERE event_id = ' .$DIC->database()->quote($this->getObjId(), 'integer').
+            ' AND item_id = ' .$DIC->database()->quote($this->getFileId(), 'integer'). ' ';
         $DIC->database()->manipulate($query);
         $file->delete();
         $session = new ilObjSession($this->ref_id);
-        echo json_encode(['message' => $file->getTitle()." Deleted",
-                'file_title' => $file->getTitle(),
-                'session_title' => $session->getTitle()]);
+        echo json_encode(['message' => $file->getTitle(). ' Deleted',
+                          'file_title' => $file->getTitle(),
+                          'session_title' => $session->getTitle()]);
         exit;
     }
 
@@ -146,11 +150,11 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
      */
     public function hasFiles($obj_id): bool
     {
-        $event_items = (ilObjectActivation::getItemsByEvent($obj_id));
+        $event_items = ilObjectActivation::getItemsByEvent($obj_id);
 
         if (count($event_items)) {
             foreach ($event_items as $item) {
-                if ($item['type'] == "file") {
+                if ($item['type'] == 'file') {
                     return true;
                 }
             }
@@ -158,31 +162,35 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
         return false;
     }
 
+    /**
+     * @throws \ILIAS\Filesystem\Exception\FileNotFoundException
+     * @throws \ILIAS\Filesystem\Exception\IOException
+     */
     public function download(): void
     {
         global $DIC;
         $this->initIDsFromRequest();
 
         $session = new ilObjSession($this->ref_id);
-        $event_items = (ilObjectActivation::getItemsByEvent($this->obj_id));
+        $event_items = ilObjectActivation::getItemsByEvent($this->obj_id);
 
         $files_count = 0;
-        $file_path = "";
+        $file_path = '';
         $file = null;
 
 
 
         if (count($event_items)) {
-            $temp_folder_name = "calendarout/".uniqid();
+            $temp_folder_name = 'calendarout/' .uniqid();
             $temp = $DIC->filesystem()->storage();
             $store = $DIC->filesystem()->storage();
             foreach ($event_items as $item) {
-                if ($item['type'] == "file") {
+                if ($item['type'] == 'file') {
                     $files_count++;
                     $file = new ilObjFile((int)$item['ref_id']);
                     $file_name =  $file->getFileName();
-                    $file_path = $file->getDirectory($file->getVersion())."/data";
-                    $rel_file_path = str_replace(CLIENT_DATA_DIR, "", $file_path);
+                    $file_path = $file->getDirectory($file->getVersion()). '/data';
+                    $rel_file_path = str_replace(CLIENT_DATA_DIR, '', $file_path);
                     $stream = $store->readStream($rel_file_path);
                     $full_temp_path = "$temp_folder_name/$file_name";
                     if(!$temp->has($full_temp_path)) {
@@ -196,12 +204,22 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
 
                 ilFileDelivery::deliverFileAttached($file_path, $file->getFileName(), $file->getFileType());
             } else {
-                $download_name = $session->getTitle().".zip";
-                $tmp_zip_folder = CLIENT_DATA_DIR."/".$temp_folder_name;
-                $tmp_zip_file = $tmp_zip_folder.".zip";
-                ilFileUtils::zip($tmp_zip_folder, $tmp_zip_file);
-                $temp->deleteDir($temp_folder_name);
-                ilFileDelivery::deliverFileAttached($tmp_zip_file, $download_name, '', true);
+                $download_name = $session->getTitle(). '.zip';
+                $tmp_zip_folder = CLIENT_DATA_DIR. '/' .$temp_folder_name;
+
+                $streams = [];
+                foreach(glob($tmp_zip_folder. '/*')as $file){
+                    $streams[] = Streams::ofResource(fopen($file, 'rb'));
+                }
+                $zip_options = $DIC->archives()->zipOptions()->withZipOutputPath($tmp_zip_folder)->withZipOutputName($download_name);
+                $zip = $DIC->archives()->zip($streams, $zip_options);
+
+                $temp->deleteDir($tmp_zip_folder);
+                $DIC->fileDelivery()->delivery()->attached(
+                    $zip->get(),
+                    $download_name,
+                    'application/zip'
+                );
             }
         }
     }
@@ -213,17 +231,19 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
      */
     public function customConvertToASCII(string $filename): string
     {
-        $umlautsI = ["Ä" => "Ae", "Ö" => "Oe", "Ü" => "Ue",
-                     "ä" => "ae", "ö" => "oe", "ü" => "ue", "ß" => "ss"
+        $umlautsI = [
+            'Ä' => 'Ae', 'Ö' => 'Oe', 'Ü' => 'Ue',
+            'ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue', 'ß' => 'ss'
         ];
         foreach($umlautsI as $src => $tgt) {
             $filename = str_replace($src, $tgt, $filename);
         }
 
-        $filename = mb_convert_encoding($filename, "ASCII");
+        $filename = mb_convert_encoding($filename, 'ASCII');
 
-        $umlautsII = ["A?" => "Ae", "O?" => "Oe", "U?" => "Ue",
-                      "a?" => "ae", "o?" => "oe", "u?" => "ue", "s?" => "ss"
+        $umlautsII = [
+            'A?' => 'Ae', 'O?' => 'Oe', 'U?' => 'Ue',
+            'a?' => 'ae', 'o?' => 'oe', 'u?' => 'ue', 's?' => 'ss'
         ];
         foreach($umlautsII as $src => $tgt) {
             $filename = str_replace($src, $tgt, $filename);
@@ -234,10 +254,9 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
     }
 
     /**
-     * @throws \ILIAS\FileUpload\Collection\Exception\NoSuchElementException
-     * @throws \ILIAS\FileUpload\Exception\IllegalStateException
+     * @throws \ILIAS\ResourceStorage\Policy\FileNamePolicyException
      */
-    private function handleFileUpload(string $tempname, UploadResult $result): string
+    private function handleFileUpload(UploadResult $result): string
     {
         global $DIC;
 
@@ -250,23 +269,23 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
         $new_ref_id = $file->createReference();
         $file->putInTree($this->dic->repositoryTree()->getParentId($this->getRefId()));
         $file->setPermissions($this->dic->repositoryTree()->getParentId($this->getRefId()));
-        $file->getUploadFile($tempname, $result->getName());
+        $file->appendUpload($result, $result->getName());
 
         /**
          * This would be the "right" way to do it, however this can create race conditions
-         * in multiple file upload. Therefore we execute the query directly here.
+         * in multiple file upload. Therefore, we execute the query directly here.
         $ev = new ilEventItems($this->getObjId());
         $ev->addItem($new_ref_id);
         $ev->update();
          */
-        $query = "INSERT INTO event_items (event_id,item_id) ".
-                "VALUES( ".
-                $DIC->database()->quote($this->getObjId(), 'integer').", ".
-                $DIC->database()->quote($new_ref_id, 'integer')." ".
-                ")";
+        $query = 'INSERT INTO event_items (event_id,item_id) ' .
+            'VALUES( ' .
+                $DIC->database()->quote($this->getObjId(), 'integer'). ', ' .
+                $DIC->database()->quote($new_ref_id, 'integer'). ' ' .
+            ')';
         $DIC->database()->manipulate($query);
 
-        return "Inserted file with ref_id: ".$new_ref_id." into event_id: .".$this->getObjId();
+        return 'Inserted file with ref_id: ' .$new_ref_id. ' into event_id: .' .$this->getObjId();
     }
 
 
@@ -321,7 +340,7 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
         $ref_ids = [];
 
         foreach (ilObject::_getAllReferences($this->getObjId()) as $ref_id) {
-            if ($this->dic->access()->checkAccess("read", "", $ref_id)) {
+            if ($this->dic->access()->checkAccess('read', '', $ref_id)) {
                 $ref_ids[] = $ref_id;
             }
         }
@@ -370,7 +389,9 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
         return new BasicFileInfoResult($this->getFileIdentifierParameterName(), $identifier, $title, $size, $mime);
     }
 
-
+    /**
+     * @throws \ILIAS\FileUpload\Exception\IllegalStateException
+     */
     protected function getUploadResult(): HandlerResult
     {
 
@@ -379,28 +400,28 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
 
         $upload = $DIC->upload();
 
-        if($_POST["customFileName"]) {
-            $upload->register(new FilenameOverride($this->customConvertToASCII($_POST["customFileName"])));
+        if($_POST['customFileName']) {
+            $upload->register(new FilenameOverride($this->customConvertToASCII($_POST['customFileName'])));
         }
 
         try {
             $upload->process();
 
-            $message = "";
+            $message = '';
             foreach ($upload->getResults() as $tempname => $result) {
-                $message .= $this->handleFileUpload($tempname, $result);
+                $message .= $this->handleFileUpload($result);
             }
             return new BasicHandlerResult(
                 $this->getFileIdentifierParameterName(),
                 HandlerResult::STATUS_OK,
                 md5(random_bytes(65)),
-                "file upload OK"
+                'file upload OK'
             );
         } catch (Exception $e) {
             return new BasicHandlerResult(
                 '',
                 HandlerResult::STATUS_FAILED,
-                "",
+                '',
                 $e->getMessage()
             );
         }
@@ -409,8 +430,8 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
     protected function getRemoveResult(string $identifier): HandlerResult
     {
         $status = HandlerResult::STATUS_OK;
-        if (null !== ($this->dic->storage->manage()->find($identifier))) {
-            $message = "file removal OK";
+        if (null !== $this->dic->storage->manage()->find($identifier)) {
+            $message = 'file removal OK';
         } else {
             $message = "file with identifier '$identifier' doesn't exist, nothing to do.";
         }

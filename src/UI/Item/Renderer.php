@@ -33,13 +33,13 @@ class Renderer extends DefaultRenderer
         $original_rendering = $default_renderer->render($item);
         $handler = new ilUnibeFileHandlerGUI();
         $handler->setObjId($component->getObjectId());
-        $file_input = $f->input()->field()->file($handler, $this->txt("files"))->withMaxFiles(20);
-        $title = $this->txt("upload").": ".$component->getTitle()->getLabel();
+        $file_input = $f->input()->field()->file($handler, $this->txt('files'))->withMaxFiles(20);
+        $title = $this->txt('upload'). ': ' .$component->getTitle()->getLabel();
 
         $dropzone = $f->dropzone()
                         ->file()
-                        ->wrapper($title, "#", $f->legacy($original_rendering), $file_input)
-        ->withSubmitCaption($this->txt("save"));
+                        ->wrapper($title, '#', $f->legacy($original_rendering), $file_input)
+        ->withSubmitLabel($this->txt('save'));
 
         return $default_renderer->render($dropzone);
     }

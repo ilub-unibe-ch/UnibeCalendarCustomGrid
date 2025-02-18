@@ -5,7 +5,7 @@ namespace iLub\Plugin\UnibeCalendarCustomGrid\Ctrl;
 /**
  * Class Ctrl
  *
- * Provides base fucntionality which is needed when implementing controller classes in ILIAS using
+ * Provides base functionality which is needed when implementing controller classes in ILIAS using
  * ilCtrl
  *
  * @author Timon Amstutz <timon.amstutz@ilub.unibe.ch>
@@ -19,7 +19,9 @@ trait CtrlAware
      */
     protected $parent_gui = null;
 
-
+    /**
+     * @throws \ilCtrlException
+     */
     public function executeCommand()
     {
         if ($this->handleNextClass($this)) {
@@ -31,13 +33,9 @@ trait CtrlAware
             $this->tabs()->activateTab($this->getActiveTabId());
         }
 
-        switch ($cmd) {
-            default:
-                //@Todo: Important add permission checks here for various actions.
-                if ($this->checkRequestReferenceId()) {
-                    $this->{$cmd}();
-                }
-                break;
+        //@Todo: Important add permission checks here for various actions.
+        if ($this->checkRequestReferenceId()) {
+            $this->{$cmd}();
         }
         $this->tpl()->show();
 
@@ -45,18 +43,13 @@ trait CtrlAware
     }
 
 
-    /**
-     * @return ICtrlAware
-     */
-    public function getParentController()
+
+    public function getParentController(): ICtrlAware
     {
         return $this->parent_gui;
     }
 
 
-    /**
-     * @param ICtrlAware $ctrlAware
-     */
     public function setParentController(ICtrlAware $ctrlAware)
     {
         $this->parent_gui = $ctrlAware;
@@ -66,7 +59,7 @@ trait CtrlAware
     /**
      * @return array of GUI_Class-Names which use CtrlAware
      */
-    public function getPossibleNextClasses()
+    public function getPossibleNextClasses(): array
     {
         return [];
     }
@@ -75,10 +68,11 @@ trait CtrlAware
     /**
      * @return null|string of active Tab
      */
-    protected function getActiveTabId()
+    protected function getActiveTabId(): ?string
     {
         return null;
     }
+
 
 
     public function cancel()
@@ -87,51 +81,36 @@ trait CtrlAware
     }
 
 
-    /***
-     * @param $html
-     */
-    protected function setContent($html)
+
+    protected function setContent(string $html): void
     {
         $this->tpl()->setContent($html);
     }
 
 
-    /***
-     * @param $title
-     */
-    protected function setTitle($title)
+    protected function setTitle(string $title): void
     {
         $this->tpl()->setTitle($title);
     }
 
 
-    /**
-     * @param $subtab_id
-     * @param $url
-     */
-    protected function pushSubTab($subtab_id, $url)
+    protected function pushSubTab(int $subtab_id, string $url)
     {
         $this->tabs()->addSubTab($subtab_id, $this->lang()->txt($subtab_id), $url);
     }
 
 
-    /**
-     * @param $subtab_id
-     */
-    protected function activeSubTab($subtab_id)
+    protected function activeSubTab(int $subtab_id)
     {
         $this->tabs()->activateSubTab($subtab_id);
     }
 
 
-    protected function checkRequestReferenceId()
+    protected function checkRequestReferenceId(): bool
     {
-        /**
-         * @var $ilAccess \ilAccessHandler
-         */
         $ref_id = $this->getCurrentRefId();
         if ($ref_id) {
-            return $this->dic()->access()->checkAccess("read", "", $ref_id);
+            return $this->dic()->access()->checkAccess('read', '', $ref_id);
         }
 
         return true;

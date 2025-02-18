@@ -12,9 +12,9 @@ namespace iLub\Plugin\UnibeCalendarCustomGrid\Ctrl;
  */
 interface ICtrlAware
 {
-    public const CMD_UPLOAD = "upload";
-    public const CMD_DOWNLOAD = "download";
-    public const CMD_DELETE = "delete";
+    public const CMD_UPLOAD = 'upload';
+    public const CMD_DOWNLOAD = 'download';
+    public const CMD_DELETE = 'delete';
 
     public function executeCommand();
 

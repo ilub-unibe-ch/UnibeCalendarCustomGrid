@@ -29,7 +29,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin
 
     final public function getPluginName(): string
     {
-        return "UnibeCalendarCustomGrid";
+        return 'UnibeCalendarCustomGrid';
     }
 
 
@@ -46,16 +46,16 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin
 
             $handler = new ilUnibeFileHandlerGUI();
             $handler->setObjId($this->getCategory()->getObjId());
-            $file = $factory->input()->field()->file($handler, $this->dic->language()->txt("files"))
+            $file = $factory->input()->field()->file($handler, $this->dic->language()->txt('files'))
                                               ->withMaxFiles(20);
             $wrapper = $factory->dropzone()->file()->wrapper(
-                $this->txt("upload_to")." ".$this->getCategory()->getTitle(),
-                "#",
+                $this->txt('upload_to'). ' ' .$this->getCategory()->getTitle(),
+                '#',
                 $factory->legacy($content),
                 $file
-            )->withSubmitCaption($this->dic->language()->txt("save"));
+            )->withSubmitLabel($this->dic->language()->txt('save'));
 
-            return "<span>".$renderer->render($wrapper)."</span>";
+            return '<span>' .$renderer->render($wrapper). '</span>';
         }
 
         return $content;
@@ -68,7 +68,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin
     {
         $ref_array = ilObject::_getAllReferences($this->getCategory()->getObjId());
         $ref_id = array_pop($ref_array);
-        return $this->dic->rbac()->system()->checkAccess("manage_materials", $ref_id, "sess");
+        return $this->dic->rbac()->system()->checkAccess('manage_materials', $ref_id, 'sess');
     }
 
 
@@ -77,7 +77,7 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin
      */
     private function isSession(): bool
     {
-        return $this->getCategory()->getObjType() === "sess";
+        return $this->getCategory()->getObjType() === 'sess';
     }
 
 
@@ -94,29 +94,32 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin
 
     }
 
+    /**
+     * @throws ilDatabaseException
+     */
     protected function getMetaDozentenDataHtml(): string
     {
 
-        $meta_html = "";
+        $meta_html = '';
 
         $res = $this->getMetaDataValueByTitle('Dozierende');
 
         if($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
             $meta_html .= "<div class='il-dozenten'> (";
-            $exploded = explode(",", $row->value);
+            $exploded = explode(',', $row->value);
             foreach($exploded as $complete_link) {
                 $name_only = trim(strip_tags($complete_link));
-                $words = explode(" ", $name_only);
-                $acronym = "";
+                $words = explode(' ', $name_only);
+                $acronym = '';
                 foreach ($words as $w) {
                     if((is_array($w) || is_string($w)) && !empty($w)) {
                         $acronym .= $w[0];
                     }
                 }
                 $short_link = str_replace($name_only, $acronym, $complete_link);
-                $meta_html .= $short_link.", ";
+                $meta_html .= $short_link. ', ';
             }
-            $meta_html = rtrim($meta_html, ", ").")</div>";
+            $meta_html = rtrim($meta_html, ', '). ')</div>';
 
         }
 
@@ -151,13 +154,13 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin
 
         }
 
-        return "";
+        return '';
     }
 
 
     public function addGlyph(): string
     {
-        return "";
+        return '';
     }
 
 
@@ -174,24 +177,23 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin
 
 
     /**
-     * @throws ilDatabaseException
      */
     public function editShyButtonTitle(): string
     {
         $files_glyph = $this->getFilesHtml();
-        $short_title = $this->getMetaDataValueByTitle("Kurzbezeichnung", "de")->fetchAssoc();
+        $short_title = $this->getMetaDataValueByTitle('Kurzbezeichnung', 'de')->fetchAssoc();
         if(!$short_title) {
             return $this->getAppointment()->getTitle().$files_glyph;
         }
 
-        $start_time = $this->getAppointment()->getStart()->get(IL_CAL_FKT_DATE, "G:i");
-        $end_time = $this->getAppointment()->getEnd()->get(IL_CAL_FKT_DATE, "G:i");
+        $start_time = $this->getAppointment()->getStart()->get(IL_CAL_FKT_DATE, 'G:i');
+        $end_time = $this->getAppointment()->getEnd()->get(IL_CAL_FKT_DATE, 'G:i');
 
-        if($this->dic->ctrl()->getCmdClass() != "ilcalendardaygui") {
+        if($this->dic->ctrl()->getCmdClass() != 'ilcalendardaygui') {
 
-            return $start_time."-".$end_time.": ". $short_title['value'].$files_glyph;
+            return $start_time. '-' .$end_time. ': ' . $short_title['value'].$files_glyph;
         } else {
-            return $start_time."-".$end_time.": ". $this->getAppointment()->getTitle().", ".$short_title['value'].$files_glyph;
+            return $start_time. '-' .$end_time. ': ' . $this->getAppointment()->getTitle(). ', ' . $short_title['value'].$files_glyph;
         }
 
     }
@@ -202,11 +204,15 @@ class ilUnibeCalendarCustomGridPlugin extends ilAppointmentCustomGridPlugin
         static $init;
         if (!$init) {
             $tpl = $this->dic->ui()->mainTemplate();
-            $tpl->addCss("node_modules/ol/ol.css");
-            $tpl->addCss("Services/Maps/css/service_openlayers.css");
-            $tpl->addJavaScript("Services/Maps/js/dist/ServiceOpenLayers.js");
-            $tpl->addCss("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/css/custom.css");
-            $tpl->addJavaScript("./Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/deleteFile.js");
+            $tpl->addCss('node_modules/ol/ol.css');
+            $tpl->addCss('Services/Maps/css/service_openlayers.css');
+            $tpl->addJavaScript('Services/Maps/js/dist/ServiceOpenLayers.js');
+            $tpl->addCss(
+                './Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/css/custom.css'
+            );
+            $tpl->addJavaScript(
+                './Customizing/global/plugins/Services/Calendar/AppointmentCustomGrid/UnibeCalendarCustomGrid/js/deleteFile.js'
+            );
             $init = true;
         }
     }

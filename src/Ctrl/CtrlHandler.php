@@ -2,6 +2,8 @@
 
 namespace iLub\Plugin\UnibeCalendarCustomGrid\Ctrl;
 
+use LogicException;
+
 /**
  * Class CtrlHandler
  *
@@ -17,7 +19,7 @@ trait CtrlHandler
     public function handleNextClass(ICtrlAware $ctrlAware)
     {
         if (!$this instanceof ICtrlAware) {
-            throw new \LogicException("Can't use trait CtrlHandler in classes which do not implement ICtrlAware");
+            throw new LogicException("Can't use trait CtrlHandler in classes which do not implement ICtrlAware");
         }
         /**
          * @var $this ICtrlAware

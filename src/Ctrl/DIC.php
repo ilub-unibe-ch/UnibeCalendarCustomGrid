@@ -2,6 +2,19 @@
 
 namespace iLub\Plugin\UnibeCalendarCustomGrid\Ctrl;
 
+use ilLanguage;
+use ilTabsGUI;
+use Exception;
+use ilTree;
+use ILIAS\HTTP\Services;
+use ilAccessHandler;
+use ilObjUser;
+use ILIAS\DI\UIServices;
+use ilGlobalTemplateInterface;
+use ilCtrl;
+use ILIAS\DI\Container;
+use ilTemplate;
+
 /**
  * Class DIC
  *
@@ -9,143 +22,89 @@ namespace iLub\Plugin\UnibeCalendarCustomGrid\Ctrl;
  */
 trait DIC
 {
-    /**
-     * @var \ilAccessHandler
-     */
-    private $access;
-    /**
-     * @var \ilObjUser
-     */
-    private $user;
-    /**
-     * @var \ilCtrl
-     */
-    private $ctrl;
-    /**
-     * @var \ilTemplate
-     */
-    private $tpl;
-    /**
-     * @var \ilLanguage
-     */
-    private $language;
-    /**
-     * @var \ilTabsGUI
-     */
-    private $tabs;
+
+    private ilAccessHandler $access;
+    private ilObjUser $user;
+    private ilCtrl $ctrl;
+    private ilTemplate $tpl;
+    private ilLanguage $language;
+    private ilTabsGUI $tabs;
 
 
-    /**
-     * @return \ILIAS\DI\Container
-     */
-    private function dic()
+    private function dic(): Container
     {
         return $GLOBALS['DIC'];
     }
 
-
-    /**
-     * @return \ilCtrl
-     */
-    public function ctrl()
+    public function ctrl():  ilCtrl
     {
         return $this->dic()->ctrl();
     }
 
 
-    /**
-     * @param $variable
-     *
-     * @return string
-     */
-    public function txt($variable)
+    public function txt(string $variable): string
     {
         return $this->dic()->language()->txt($variable);
     }
 
 
-    /**
-     * @return \ilTemplate
-     */
-    public function tpl()
+
+    public function tpl():  ilGlobalTemplateInterface
     {
         return $this->dic()->ui()->mainTemplate();
     }
 
 
-    /**
-     * @return \ilLanguage
-     */
-    public function language()
+    public function language(): ilLanguage
     {
         return $this->dic()->language();
     }
 
 
-    /**
-     * @return \ilTabsGUI
-     */
-    public function tabs()
+    public function tabs() : ilTabsGUI
     {
         return $this->dic()->tabs();
     }
 
 
-    /**
-     * @return \ILIAS\DI\UIServices
-     */
-    public function ui()
+    public function ui(): UIServices
     {
         return $this->dic()->ui();
     }
 
 
-    /**
-     * @return \ilObjUser
-     */
-    public function user()
+    public function user(): ilObjUser
     {
         return $this->dic()->user();
     }
 
 
-    /**
-     * @return \ilAccessHandler
-     */
-    public function access()
+    public function access(): ilAccessHandler
     {
         return $this->dic()->access();
     }
 
 
-    /**
-     * @return \ILIAS\DI\HTTPServices
-     */
-    public function http()
+    public function http(): Services
     {
         return $this->dic()->http();
     }
 
 
-    /**
-     * @return \ilTree
-     */
-    public function tree()
+    public function tree(): ilTree
     {
         return $this->dic()->repositoryTree();
     }
 
 
-    /**
-     * @return int
-     */
-    protected function getCurrentRefId()
+    protected function getCurrentRefId(): int
     {
         try {
             $http = $this->dic()->http();
-            $ref_id = (int)$http->request()->getQueryParams()["ref_id"];
-        } catch (\Exception $e) {
-            $ref_id = (int)$_GET["ref_id"];
+            var_dump("hello");exit;
+            $ref_id = (int) $http->request()->getQueryParams()['ref_id'];
+        } catch (Exception $e) {
+            $ref_id = (int) $_GET['ref_id'];
         }
 
         return $ref_id;
