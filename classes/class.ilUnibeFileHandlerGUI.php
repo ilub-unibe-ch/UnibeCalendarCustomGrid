@@ -204,7 +204,7 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
 
                 ilFileDelivery::deliverFileAttached($file_path, $file->getFileName(), $file->getFileType());
             } else {
-                $download_name = $session->getTitle(). '.zip';
+                $download_name = str_replace('/', '',$session->getTitle(). '.zip');
                 $tmp_zip_folder = CLIENT_DATA_DIR. '/' .$temp_folder_name;
 
                 $streams = [];
