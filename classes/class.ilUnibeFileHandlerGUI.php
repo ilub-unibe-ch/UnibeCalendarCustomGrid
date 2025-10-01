@@ -181,9 +181,12 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
 
 
         if (count($event_items)) {
-            $temp_folder_name = 'calendarout/' .uniqid();
             $temp = $DIC->filesystem()->storage();
             $store = $DIC->filesystem()->storage();
+            foreach($temp->listContents('calendarout/')as $file) {
+                    $temp->deleteDir($file->getPath());
+                    }
+            $temp_folder_name = 'calendarout/' .uniqid();
             foreach ($event_items as $item) {
                 if ($item['type'] == 'file') {
                     $files_count++;
@@ -214,7 +217,6 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
                 $zip_options = $DIC->archives()->zipOptions()->withZipOutputPath($tmp_zip_folder)->withZipOutputName($download_name);
                 $zip = $DIC->archives()->zip($streams, $zip_options);
 
-                $temp->deleteDir($tmp_zip_folder);
                 $DIC->fileDelivery()->delivery()->attached(
                     $zip->get(),
                     $download_name,
