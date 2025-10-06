@@ -183,9 +183,11 @@ class ilUnibeFileHandlerGUI extends AbstractCtrlAwareUploadHandler
         if (count($event_items)) {
             $temp = $DIC->filesystem()->storage();
             $store = $DIC->filesystem()->storage();
-            foreach($temp->listContents('calendarout/')as $file) {
-                if ($temp->hasDir($file->getPath())) {
-                    $temp->deleteDir($file->getPath());
+            if(count($temp->listContents('calendarout/'))>20) {
+                foreach ($temp->listContents('calendarout/') as $file) {
+                    if ($temp->hasDir($file->getPath())) {
+                        $temp->deleteDir($file->getPath());
+                    }
                 }
             }
             $temp_folder_name = 'calendarout/' .uniqid();
